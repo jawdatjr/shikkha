@@ -1,0 +1,10 @@
+name = "ashik-shikkha-sync"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+
+[vars]
+GH_BRANCH = "main"
+GH_OWNER = "jawdatjr"
+GH_REPO = "shikkha_backup"
+ALLOWED_ORIGIN = "https://jawdatjr.github.io"
+# GH_TOKEN and SALESMAN_KEYS are set ONLY as Worker secrets via wrangler.
