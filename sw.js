@@ -1,5 +1,5 @@
 // Ashik Shikkha — Offline-first PWA app shell, not cloud data storage.
-const CACHE_VERSION = 'ashik-shikkha-salesman-v2-2026-10-17';
+const CACHE_VERSION = 'ashik-shikkha-salesman-mobile-v3-2026-10-17';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './tailwind-offline.css', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
