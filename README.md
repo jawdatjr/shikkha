@@ -83,3 +83,13 @@ The app is designed for phone use (Android Chrome or iPhone Safari) and adapts i
 **Offline:** Complete the first online load, then test Airplane Mode. Use the same installed app on that device so that browser local data persists. Never clear the site's storage without making a JSON backup.
 
 **Cloud backup status:** NOT CONNECTED yet. Two connected GitHub repositories alone do not activate online data sync. The Cloudflare Worker must be securely deployed with scoped credentials and configured inside the app. Each phone must complete its first sync online. Offline changes are local until confirmed synced.
+
+## Mobile receipt improvements (v4)
+
+- The phone receipt tab uses separate **edit** and **preview** steps to avoid a long mixed desktop-style screen. The fixed phone bar toggles between them; the receipt can still be saved without opening the preview.
+- The HTML preview stacks Total/Paid/Due vertically, uses larger phone-readable type, and exposes receipt sharing at the top.
+- Customer-facing exports and mobile file shares use a high-resolution **900 x 1870 portrait receipt image** rather than the legacy 1240 x 720 landscape output. The generated PDF page retains that portrait aspect ratio; a direct PNG share button is available for mobile chats.
+- Existing saved receipts, deletion audit events, and local data storage are not migrated or erased by this layout change.
+- Once deployed, mobile users may need to relaunch/refresh the installed PWA to activate the updated service worker (cache v4).
+- **Cloud sync remains unconfigured** until the private Cloudflare Worker deployment and secrets are completed. Offline local saves are not GitHub backups.
+
