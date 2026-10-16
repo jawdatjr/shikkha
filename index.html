@@ -896,6 +896,140 @@
       }
     }
 
+
+    /* Mobile-first application UI. Scoped to screen: print vouchers stay unchanged. */
+    [hidden] { display: none !important; }
+    .mobile-create-actions, .mobile-history-tabs, #mobNavMore, .mobile-more-menu { display:none; }
+    .mobile-design-options > summary { display:none; }
+    @media screen and (max-width: 767px) {
+      html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+      body { background:#edf3f8; padding-bottom: calc(153px + env(safe-area-inset-bottom)); overflow-x:hidden; }
+      .app-shell { width:100%; max-width:100%; padding:8px 10px 14px; }
+      .app-shell > * { max-width:100%; min-width:0; }
+      .topbar { flex-wrap:nowrap; align-items:center; gap:8px; padding:11px 12px; border-radius:14px; margin-bottom:12px; box-shadow:0 6px 20px #0f172a21; }
+      .topbar > div:first-child { flex:1; min-width:0; gap:8px; }
+      .topbar > div:first-child > div:first-child { width:38px; height:38px; border-radius:12px; flex-shrink:0; font-size:15px; }
+      .topbar > div:first-child > div:last-child { min-width:0; }
+      .topbar > div:first-child > div:last-child > div { gap:5px; }
+      .topbar > div:first-child > div:last-child > div > span:first-child { display:none; }
+      #appHeaderAgencyTitle { font-size:15px; line-height:1.23; max-width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+      #offlineStatusBadge { font-size:10px; white-space:nowrap; padding:3px 7px; }
+      #appHeaderSubDesc { display:none; }
+      .topbar > div:last-child { flex:0 0 auto; }
+      #btnQuickSave,#btnDownloadPdf,#btnDownloadImage,#btnPrintReceipt { display:none !important; }
+      #btnQuickLangToggle { min-height:38px; font-size:10px; padding:5px 7px; }
+      .mobile-bottom-nav { grid-template-columns:repeat(5,minmax(0,1fr)); gap:3px; padding:7px 7px calc(7px + env(safe-area-inset-bottom)); border-top:1px solid #dbeafe; border-radius:18px 18px 0 0; background:#ffffff; box-shadow:0 -6px 28px #0f172a1c; }
+      .mobile-bottom-nav #mobNavVerify,.mobile-bottom-nav #mobNavSettings { display:none; }
+      #mobNavMore { display:flex; }
+      .mob-nav-btn { min-height:55px; color:#64748b; font-size:10.5px; font-weight:800; gap:3px; touch-action:manipulation; }
+      .mob-nav-btn span:first-child { font-size:20px !important; line-height:23px; }
+      .mob-nav-btn.active, .mob-nav-btn[aria-expanded="true"] { background:#e6f6f8; color:#006e7a; }
+      .mobile-more-menu { display:flex; position:fixed; z-index:905; bottom:calc(77px + env(safe-area-inset-bottom)); left:12px; right:12px; flex-direction:column; gap:5px; padding:12px; background:#fff; border-radius:18px; border:1px solid #cbd5e1; box-shadow:0 -8px 30px #0f172a33; }
+      .mobile-more-title { font-size:11px; color:#64748b; font-weight:900; padding:3px 8px 6px; }
+      .mobile-more-menu > button { display:flex; justify-content:space-between; align-items:center; width:100%; background:#f5f9fc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; font-weight:800; font-size:14px; color:#0f172a; text-align:left; }
+      .mobile-more-menu > button span { font-size:22px; color:#64748b; }
+      .mobile-create-actions { display:grid; position:fixed; bottom:calc(74px + env(safe-area-inset-bottom)); left:10px; right:10px; z-index:850; grid-template-columns:1.5fr 1fr; gap:8px; padding:9px; border-radius:15px; background:#fff; box-shadow:0 4px 20px #0f172a30; border:1px solid #cbd5e1; }
+      .mobile-create-actions button { min-height:46px; border-radius:11px; padding:9px 7px; font-family:inherit; font-weight:900; font-size:13px; background:#008996; color:white; border:0; touch-action:manipulation; }
+      .mobile-create-actions button:last-child { color:#0f172a; background:#edf4f8; border:1px solid #cbd5e1; }
+      body:has(input:focus) .mobile-create-actions, body:has(textarea:focus) .mobile-create-actions, body:has(select:focus) .mobile-create-actions { display:none; }
+      .panel-card { border:1px solid #dce6ee; border-radius:15px; padding:13px; box-shadow:0 2px 13px #0f172a0a; }
+      .panel-card h2 { font-size:15px; line-height:1.4; }
+      .panel-card p { line-height:1.5; }
+      .workspace-grid { display:grid; grid-template-columns:minmax(0,1fr); gap:12px; }
+      .workspace-grid > div { min-width:0; }
+      #viewTabCreate .grid-cols-3 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      #quickThemeContainer { grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+      #layoutModeGroup { flex-wrap:wrap; }
+      #layoutModeGroup > button { min-height:44px; }
+      #panelCreate > .flex:first-child { align-items:flex-start; }
+      #btnNewReceipt { min-width:100px; min-height:40px; white-space:normal; }
+      .mobile-design-options { border:1px solid #cee0e7; border-radius:12px; padding:0 10px; margin:8px 0 13px; background:#f6fafc; }
+      .mobile-design-options > summary { display:flex; align-items:center; justify-content:space-between; list-style:none; padding:12px 4px; font-size:12px; font-weight:850; color:#155e75; cursor:pointer; }
+      .mobile-design-options > summary::-webkit-details-marker { display:none; }
+      .mobile-design-options > summary span { font-size:10px; color:#475569; font-weight:600; }
+      .mobile-design-options[open] { padding-bottom:10px; }
+      .form-group { margin-bottom:11px; min-width:0; }
+      .form-label { font-size:12px; margin-bottom:6px; }
+      .form-input,.form-select,.form-textarea { width:100%; max-width:100%; min-height:45px; border-radius:10px; font-size:16px !important; }
+      input[type="number"] { appearance:textfield; }
+      .form-input:focus,.form-select:focus,.form-textarea:focus { box-shadow:0 0 0 3px #0ea5b021; }
+      .btn { min-height:43px; line-height:1.25; }
+      button, summary { -webkit-tap-highlight-color:transparent; }
+      #btnCalcPaxTotal { white-space:normal !important; min-height:42px; }
+      #inpPerPersonRate { flex:1; min-width:72px; width:100% !important; }
+      #panelCreate .bg-cyan-50\/90 .grid-cols-3 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      #panelCreate .bg-cyan-50\/90 .grid-cols-3 > div:first-child { grid-column:1 / -1; }
+      #panelCreate .bg-cyan-50\/90 .grid-cols-3 input { min-width:0; }
+      #panelCreate > .mt-3.pt-3.grid { grid-template-columns:1fr; }
+      #btnFormSaveAndLog { min-height:48px; }
+      #signaturePadCanvas { touch-action:none; }
+      .receipt-preview-wrapper { padding:8px; overflow-x:hidden; background:#e2eaf0; border-radius:12px; }
+      .receipt-paper { width:100%; max-width:100%; min-width:0; overflow:hidden; }
+      .receipt-inner { padding:12px 10px 11px 17px; }
+      .travel-top-strip { gap:4px; padding:5px 8px 5px 20px; font-size:8px; letter-spacing:0; line-height:1.25; overflow-wrap:anywhere; }
+      .travel-top-strip > span { min-width:0; }
+      .travel-top-strip #topStripSecId { font-size:8px; white-space:nowrap; }
+      #previewCompanyBn { font-size:19px; line-height:1.2; overflow-wrap:anywhere; }
+      #previewCompanyEn { font-size:10px; letter-spacing:.02em; overflow-wrap:anywhere; }
+      #previewReceiptBadge { font-size:13px; }
+      .receipt-line-row { align-items:flex-start; flex-wrap:wrap; min-height:30px; gap:3px 7px; }
+      .receipt-line-label { font-size:11px; }
+      .receipt-line-value { font-size:13px; padding-left:0; min-width:0; overflow-wrap:anywhere; }
+      #previewCustomerName,#previewEventName { min-width:0; overflow-wrap:anywhere; }
+      #previewPaxBadge,#previewSeatBadge,#previewSalesmanTag { font-size:10px; white-space:normal; }
+      .amount-pill { font-size:13px; min-width:66px; padding:3px 8px; }
+      #previewTotalPill,#previewAdvancePill,#previewDuePill { max-width:100%; }
+      .payment-check-box { font-size:11px; gap:4px; }
+      .check-square { width:17px; height:17px; }
+      .official-seal { min-width:0; max-width:160px; }
+      .receipt-footer-banner { font-size:12px; }
+      .receipt-watermark-text { font-size:17px; max-width:95%; white-space:normal; }
+      #viewTabCreate > div:nth-child(3) .p-3.rounded-2xl .flex.flex-wrap.gap-1\.5 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; }
+      #viewTabCreate > div:nth-child(3) .p-3.rounded-2xl .flex.flex-wrap.gap-1\.5 > button { padding:7px 4px; }
+      .mobile-history-tabs { display:grid; grid-template-columns:1fr 1fr; gap:5px; border:1px solid #dbe5ed; border-radius:12px; padding:5px; background:#fff; margin-bottom:10px; }
+      .mobile-history-tabs button { border:0; border-radius:9px; background:transparent; color:#64748b; padding:11px 6px; font-size:13px; font-weight:850; min-height:44px; }
+      .mobile-history-tabs button.selected { background:#0f172a; color:white; }
+      #viewTabHistory[data-mobile-history="active"] #panelDeletedHistory { display:none; }
+      #viewTabHistory[data-mobile-history="deleted"] #panelHistory { display:none; }
+      #historyListContainer, #deletedHistoryContainer { grid-template-columns:minmax(0,1fr); }
+      #dashboardKpiGrid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+      #dashboardKpiGrid > .kpi-card { min-width:0; padding:12px 11px; }
+      #dashboardKpiGrid > .kpi-card:nth-child(3) { grid-column:1 / -1; grid-row:1; }
+      #dashboardKpiGrid .text-2xl { font-size:19px; line-height:1.25; overflow-wrap:anywhere; }
+      #viewTabDashboard > div:first-child { padding:15px !important; gap:10px; }
+      #viewTabDashboard > div:first-child h2 { font-size:18px; line-height:1.35; }
+      #viewTabDashboard > div:first-child button { flex:1 1 140px; }
+      #dashMethodBreakdownGrid { grid-template-columns:minmax(0,1fr); }
+      #viewTabDashboard .overflow-x-auto table { min-width:0; width:100%; }
+      #viewTabDashboard #dashPaymentLedgerBody { display:block; width:100%; }
+      #viewTabDashboard #dashPaymentLedgerBody > tr { display:block; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:10px; margin-bottom:10px; }
+      #viewTabDashboard #dashPaymentLedgerBody td { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:6px 2px; border:0; width:100%; min-width:0; font-size:12px; white-space:normal; text-align:right; overflow-wrap:anywhere; }
+      #viewTabDashboard #dashPaymentLedgerBody td::before { content:""; flex:0 0 100px; text-align:left; color:#64748b; font-size:11px; font-weight:750; }
+      #viewTabDashboard #dashPaymentLedgerBody td:nth-child(1)::before { content:"তারিখ ও সময়"; }
+      #viewTabDashboard #dashPaymentLedgerBody td:nth-child(2)::before { content:"গ্রাহক"; }
+      #viewTabDashboard #dashPaymentLedgerBody td:nth-child(3)::before { content:"ট্যুর / সিট"; }
+      #viewTabDashboard #dashPaymentLedgerBody td:nth-child(4)::before { content:"পেমেন্ট"; }
+      #viewTabDashboard #dashPaymentLedgerBody td:nth-child(5)::before { content:"মোট বিল"; }
+      #viewTabDashboard #dashPaymentLedgerBody td:nth-child(6)::before { content:"জমা"; }
+      #viewTabDashboard #dashPaymentLedgerBody td:nth-child(7)::before { content:"বকেয়া"; }
+      #viewTabDashboard #dashPaymentLedgerBody td:nth-child(8)::before { content:"অ্যাকশন"; }
+      #viewTabDashboard .overflow-x-auto table > thead { display:none; }
+      #viewTabDashboard .overflow-x-auto table, #viewTabDashboard .overflow-x-auto tbody { display:block; }
+      #viewTabSettings > .grid { gap:12px; }
+      #viewTabHistory .panel-card,#viewTabExpenses .panel-card,#viewTabSettings .panel-card { min-width:0; }
+      #viewTabHistory input,#viewTabExpenses input { max-width:100%; }
+      .toast-box { bottom:calc(146px + env(safe-area-inset-bottom)); left:12px; right:12px; width:auto; padding:11px; }
+      body:not(:has(#viewTabCreate:not(.hidden))) { padding-bottom:calc(90px + env(safe-area-inset-bottom)); }
+    }
+    @media screen and (min-width: 768px) and (max-width:1023px) {
+      .topbar { gap:10px; }
+      .workspace-grid { grid-template-columns:minmax(0,1fr); }
+      .mobile-bottom-nav { padding-bottom:calc(8px + env(safe-area-inset-bottom)); }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      html { scroll-behavior:auto; }
+    }
+
   </style>
 </head>
 <body>
@@ -989,7 +1123,7 @@
       </div>
 
       <!-- 5 Main Financial KPI Cards (Total Cash In, Total Expense, Total Current Amount, Total Due, Total Bill) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+      <div id="dashboardKpiGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         <!-- Card 1: Total Cash In (টাকা কত আসছে) -->
         <div class="kpi-card border-l-4 border-l-emerald-600 bg-emerald-50/50">
           <div class="flex items-center justify-between text-xs font-extrabold text-emerald-800 uppercase">
@@ -1131,6 +1265,10 @@
          VIEW TAB 2: CREATE RECEIPT & LIVE PREVIEW (Salesman POS)
          ========================================================== -->
     <div id="viewTabCreate" class="workspace-grid">
+      <div class="mobile-create-actions no-print" aria-label="মোবাইল রিসিপ্ট শর্টকাট">
+        <button type="button" id="mobileSaveReceipt">💾 রিসিপ্ট সেভ</button>
+        <button type="button" id="mobileSeeReceipt">👁️ প্রিভিউ</button>
+      </div>
       <!-- LEFT COLUMN: Editor Form -->
       <div class="no-print">
         <section id="panelCreate" class="panel-card">
@@ -1154,6 +1292,8 @@
             </div>
           </div>
 
+          <details id="mobileReceiptDesignOptions" class="mobile-design-options" open>
+            <summary>🎨 রিসিপ্ট ডিজাইন ও কালার থিম <span>পরিবর্তন করুন</span></summary>
           <!-- Travel Layout Mode Selector -->
           <div class="mb-3">
             <label class="form-label">🎫 রিসিপ্ট ডিজাইন স্টাইল (Travel Receipt Style)</label>
@@ -1175,6 +1315,7 @@
             </div>
           </div>
 
+          </details>
           <!-- Invoice, Date & Salesman Row -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div class="form-group">
@@ -1588,7 +1729,11 @@
     <!-- ==========================================================
          VIEW TAB 3: FULL-PAGE RECEIPT HISTORY & DUE COLLECTION
          ========================================================== -->
-    <div id="viewTabHistory" class="hidden no-print">
+    <div id="viewTabHistory" class="hidden no-print" data-mobile-history="active">
+      <div class="mobile-history-tabs" role="group" aria-label="হিস্ট্রি নির্বাচন">
+        <button type="button" id="mobileActiveHistory" class="selected" aria-pressed="true">📂 রিসিপ্ট হিস্ট্রি</button>
+        <button type="button" id="mobileDeletedHistory" aria-pressed="false">🗑️ ডিলিট লগ</button>
+      </div>
       <section id="panelHistory" class="panel-card">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4 mb-4">
           <div>
@@ -1658,7 +1803,7 @@
           <!-- Populated by JS -->
         </div>
       </section>
-      <section class="panel-card mt-4" aria-labelledby="auditLogTitle">
+      <section id="panelDeletedHistory" class="panel-card mt-4" aria-labelledby="auditLogTitle">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
           <h3 id="auditLogTitle" class="font-extrabold text-rose-900 text-base">🗑️ Deleted History / Audit Log</h3>
           <span class="text-xs font-bold text-slate-600">মোট ডিলিট: <strong id="deletedCount">0</strong></span>
@@ -2082,7 +2227,15 @@ Nearby Sadar Hospital Road.</textarea>
       <span class="text-base">⚙️</span>
       <span>সেটিংস</span>
     </button>
+    <button type="button" class="mob-nav-btn" id="mobNavMore" aria-controls="mobileMoreMenu" aria-expanded="false">
+      <span class="text-base">☰</span><span>আরও</span>
+    </button>
   </nav>
+  <div id="mobileMoreMenu" class="mobile-more-menu no-print" hidden>
+    <div class="mobile-more-title">আরও অপশন</div>
+    <button type="button" data-more-route="verify">🛡️ রিসিপ্ট যাচাই <span>›</span></button>
+    <button type="button" data-more-route="settings">⚙️ সেটিংস ও ব্যাকআপ <span>›</span></button>
+  </div>
 
   <!-- Toast Box -->
   <div id="toastNotification" class="toast-box" role="status" aria-live="polite">
@@ -4179,6 +4332,17 @@ Nearby Sadar Hospital Road.</textarea>
           }
         });
 
+        var moreBtn = document.getElementById('mobNavMore');
+        var moreMenu = document.getElementById('mobileMoreMenu');
+        if (moreBtn) {
+          moreBtn.classList.toggle('active', tabName === 'verify' || tabName === 'settings');
+          moreBtn.setAttribute('aria-expanded', 'false');
+          if (moreMenu) moreMenu.hidden = true;
+        }
+        if (window.matchMedia('(max-width: 767px)').matches) {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+
         if (tabName === 'dashboard') {
           renderDashboardAnalytics();
         } else if (tabName === 'history') {
@@ -4188,6 +4352,19 @@ Nearby Sadar Hospital Road.</textarea>
         } else if (tabName === 'create') {
           updateLiveReceipt();
         }
+      }
+
+      function setMobileHistoryView(view) {
+        var tab = document.getElementById('viewTabHistory');
+        if (!tab) return;
+        var deleted = view === 'deleted';
+        tab.setAttribute('data-mobile-history', deleted ? 'deleted' : 'active');
+        var b1 = document.getElementById('mobileActiveHistory');
+        var b2 = document.getElementById('mobileDeletedHistory');
+        b1.classList.toggle('selected', !deleted);
+        b2.classList.toggle('selected', deleted);
+        b1.setAttribute('aria-pressed', String(!deleted));
+        b2.setAttribute('aria-pressed', String(deleted));
       }
 
       function downloadStandaloneGithubHtml() {
@@ -4205,6 +4382,41 @@ Nearby Sadar Hospital Road.</textarea>
       }
 
       function bindEvents() {
+        var designOptions = document.getElementById('mobileReceiptDesignOptions');
+        if (designOptions && window.matchMedia('(max-width: 767px)').matches) designOptions.open = false;
+
+        var moreBtn = document.getElementById('mobNavMore');
+        var moreMenu = document.getElementById('mobileMoreMenu');
+        function closeMobileMore() {
+          moreMenu.hidden = true;
+          moreBtn.setAttribute('aria-expanded', 'false');
+        }
+        moreBtn.addEventListener('click', function () {
+          var next = moreMenu.hidden;
+          moreMenu.hidden = !next;
+          moreBtn.setAttribute('aria-expanded', String(next));
+        });
+        document.querySelectorAll('[data-more-route]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            closeMobileMore();
+            switchTab(button.getAttribute('data-more-route'));
+          });
+        });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeMobileMore();
+        });
+        document.addEventListener('click', function (e) {
+          if (!moreMenu.contains(e.target) && !moreBtn.contains(e.target)) closeMobileMore();
+        });
+        document.getElementById('mobileSaveReceipt').addEventListener('click', function () {
+          document.getElementById('btnFormSaveAndLog').click();
+        });
+        document.getElementById('mobileSeeReceipt').addEventListener('click', function () {
+          document.getElementById('receiptPaperElement').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        document.getElementById('mobileActiveHistory').addEventListener('click', function () { setMobileHistoryView('active'); });
+        document.getElementById('mobileDeletedHistory').addEventListener('click', function () { setMobileHistoryView('deleted'); });
+
         // Top & Mobile Navigation Tabs
         ['dashboard', 'create', 'history', 'expenses', 'verify', 'settings'].forEach(function (t) {
           var cap = t.charAt(0).toUpperCase() + t.slice(1);
