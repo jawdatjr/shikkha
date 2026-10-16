@@ -70,3 +70,16 @@ Python দিয়ে key তৈরি করতে পারেন: `python -c "i
 - Target Pages URL: https://jawdatjr.github.io/shikkha/ (only after Pages deployment succeeds)
 - Data repo: `jawdatjr/shikkha_backup` (private)
 - Cloud sync needs Cloudflare Worker deployment plus GH_TOKEN and SALESMAN_KEYS configured privately. No real cloud backup until then.
+
+
+## Mobile-first UI (2026-10-17)
+
+The app is designed for phone use (Android Chrome or iPhone Safari) and adapts its layout based on screen width. Changes include a compact mobile header, five-item navigation with a More menu, a touch-friendly receipt save/preview bar, collapsible design options, receipt/deletion history tabs, mobile-friendly balances and payment ledger cards, and narrower receipt previews.
+
+**Open this URL on your phone:** https://jawdatjr.github.io/shikkha/
+
+**Install:** Android Chrome → menu → Add to Home Screen / Install app. iPhone Safari → Share → Add to Home Screen.
+
+**Offline:** Complete the first online load, then test Airplane Mode. Use the same installed app on that device so that browser local data persists. Never clear the site's storage without making a JSON backup.
+
+**Cloud backup status:** NOT CONNECTED yet. Two connected GitHub repositories alone do not activate online data sync. The Cloudflare Worker must be securely deployed with scoped credentials and configured inside the app. Each phone must complete its first sync online. Offline changes are local until confirmed synced.
