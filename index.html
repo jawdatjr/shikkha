@@ -1030,6 +1030,76 @@
       html { scroll-behavior:auto; }
     }
 
+
+    /* Phone receipt flow: edit a booking or see/share its portrait preview, not both in one long page. */
+    @media screen and (max-width:767px) {
+      #viewTabCreate[data-mobile-receipt-step="edit"] > .receipt-preview-section { display:none; }
+      #viewTabCreate[data-mobile-receipt-step="preview"] > .receipt-form-section { display:none; }
+      #viewTabCreate[data-mobile-receipt-step="preview"] { padding-top:2px; }
+      #viewTabCreate[data-mobile-receipt-step="preview"] .mobile-create-actions { grid-template-columns:1fr 1fr; }
+      #viewTabCreate .receipt-preview-section { min-width:0; max-width:100%; }
+      #viewTabCreate .receipt-preview-section > .p-3:first-child { padding:11px !important; margin:0 0 9px; }
+      #viewTabCreate .receipt-preview-section > .p-3:first-child > .flex:last-child {
+        display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px !important; width:100%;
+      }
+      #viewTabCreate .receipt-preview-section > .p-3:first-child > .flex:last-child button {
+        width:100%; padding:9px 4px !important; font-size:11px; min-height:45px; white-space:normal; line-height:1.3;
+      }
+      #viewTabCreate .receipt-preview-section > .p-3:first-child > .flex:first-child { width:100%; }
+      .receipt-preview-wrapper { padding:6px !important; background:#e3edf2; overflow:visible; }
+      #receiptPaperElement { border-radius:10px; border-width:1.5px; overflow:hidden; }
+      #receiptPaperElement .ticket-side-stub { width:6px; }
+      #receiptPaperElement .ticket-notch-left,#receiptPaperElement .ticket-notch-right { display:none; }
+      #receiptPaperElement .receipt-inner { padding:12px 12px 10px 15px; }
+      #receiptPaperElement .receipt-inner > .flex:first-child { display:flex; flex-direction:column; gap:8px; }
+      #receiptPaperElement #defaultTravelCrest { width:38px; height:38px; padding:7px; flex:0 0 38px; }
+      #receiptPaperElement #defaultTravelCrest svg { width:23px; height:23px; }
+      #receiptPaperElement #previewCompanyBn { font-size:21px; line-height:1.22; overflow-wrap:anywhere; }
+      #receiptPaperElement #previewCompanyEn { font-size:10.5px; line-height:1.4; letter-spacing:.02em; }
+      #receiptPaperElement #previewReceiptBadge { font-size:13px; padding:5px 12px; }
+      #receiptPaperElement #previewPhone1,#receiptPaperElement #previewPhone2 { font-size:12px; }
+      #receiptPaperElement #previewCompanyAddress { font-size:11px; max-width:100%; }
+      #receiptPaperElement .travel-top-strip { font-size:9px; gap:4px; }
+      #receiptPaperElement .travel-top-strip > span:first-child { max-width:75%; min-width:0; overflow-wrap:anywhere; }
+      #receiptPaperElement #topStripSecId { font-size:8px; max-width:36%; white-space:normal; overflow-wrap:anywhere; text-align:right; }
+      #receiptPaperElement .receipt-inner > .flex.flex-wrap.items-baseline { gap:8px; align-items:center; }
+      #receiptPaperElement .receipt-inner > .flex.flex-wrap.items-baseline > div { min-width:0 !important; gap:4px; }
+      #receiptPaperElement #previewInvoiceNo { font-size:16px; padding:4px 5px; }
+      #receiptPaperElement #previewDate { font-size:13px; padding:0; }
+      #receiptPaperElement .receipt-line-row { min-height:39px; padding:7px 2px 5px; flex-wrap:wrap; gap:5px; }
+      #receiptPaperElement .receipt-line-label { color:#006b78; font-size:12px; }
+      #receiptPaperElement .receipt-line-value { flex:1 1 65%; min-width:0; font-size:14px; line-height:1.45; text-align:right; display:flex; flex-wrap:wrap; justify-content:flex-end; gap:5px; padding:0; }
+      #receiptPaperElement #previewCustomerName,#receiptPaperElement #previewEventName { text-align:right; overflow-wrap:anywhere; }
+      #receiptPaperElement #previewCustomerContact { overflow-wrap:anywhere; font-size:13px; }
+      #receiptPaperElement #previewSeatBadge,#receiptPaperElement #previewSalesmanTag { font-size:10px; }
+      #receiptPaperElement .receipt-inner > .flex.flex-wrap.items-center.justify-between.gap-3.pt-4 {
+        display:grid; grid-template-columns:1fr; gap:7px; padding-top:10px;
+      }
+      #receiptPaperElement .receipt-inner > .flex.flex-wrap.items-center.justify-between.gap-3.pt-4 > div {
+        display:flex; align-items:center; justify-content:space-between; min-width:0; gap:7px;
+        padding:7px 10px; border:1px solid #c7e1e8; border-radius:10px; background:#f8fefe;
+      }
+      #receiptPaperElement .receipt-inner > .flex.flex-wrap.items-center.justify-between.gap-3.pt-4 > div:nth-child(2) { background:#f0fdf4; }
+      #receiptPaperElement .receipt-inner > .flex.flex-wrap.items-center.justify-between.gap-3.pt-4 > div:nth-child(3) { background:#fff1f2; }
+      #receiptPaperElement .amount-pill { border-width:1px; min-width:96px; font-size:17px; text-align:center; padding:4px 7px; }
+      #receiptPaperElement .receipt-inner > .flex.flex-wrap.items-center.justify-between.gap-3.pt-4 .receipt-line-label { font-size:13px; white-space:normal; }
+      #receiptPaperElement .payment-check-box { font-size:11px; gap:4px; }
+      #receiptPaperElement .receipt-inner > .flex.flex-wrap.items-center.justify-between.gap-3.py-2 { gap:9px; }
+      #receiptPaperElement .receipt-inner > .flex.flex-wrap.items-center.justify-between.gap-3.py-2 > div:first-child { width:100%; gap:7px 10px; }
+      #receiptPaperElement #previewQrBlock { flex-wrap:wrap; min-width:0; }
+      #receiptPaperElement #previewSecurityCode { max-width:100%; overflow-wrap:anywhere; font-size:10px; }
+      #receiptPaperElement .official-seal { max-width:100%; min-width:0; }
+      #receiptPaperElement .receipt-footer-banner { padding:10px; font-size:12px; line-height:1.45; }
+      #receiptPaperElement .microtext-strip { display:none; }
+      #viewTabCreate .receipt-preview-section .receipt-preview-wrapper + * { max-width:100%; }
+    }
+    @media screen and (max-width:359px) {
+      #receiptPaperElement #previewCompanyBn { font-size:18px; }
+      #receiptPaperElement .receipt-inner { padding:10px 8px 9px 12px; }
+      #receiptPaperElement .amount-pill { min-width:80px; font-size:15px; }
+      #viewTabCreate .receipt-preview-section > .p-3:first-child > .flex:last-child button { font-size:10px; }
+    }
+
   </style>
 </head>
 <body>
@@ -4492,10 +4562,22 @@ Nearby Sadar Hospital Road.</textarea>
         } else if (tabName === 'expenses') {
           renderExpenseList();
         } else if (tabName === 'create') {
+          setMobileReceiptStep('edit');
           updateLiveReceipt();
         }
       }
 
+      function setMobileReceiptStep(step) {
+        var tab=document.getElementById('viewTabCreate');
+        var toggle=document.getElementById('mobileSeeReceipt');
+        if(!tab||!toggle)return;
+        var preview=step==='preview';
+        tab.setAttribute('data-mobile-receipt-step',preview?'preview':'edit');
+        toggle.textContent=preview?'✏️ তথ্য লিখুন':'👁️ প্রিভিউ';
+        toggle.setAttribute('aria-label',preview?'রিসিপ্ট তথ্য সম্পাদনা করুন':'রিসিপ্ট প্রিভিউ দেখুন');
+        if(preview)updateLiveReceipt();
+        if(window.matchMedia('(max-width:767px)').matches) window.scrollTo({top:0,behavior:'auto'});
+      }
       function setMobileHistoryView(view) {
         var tab = document.getElementById('viewTabHistory');
         if (!tab) return;
@@ -4554,7 +4636,8 @@ Nearby Sadar Hospital Road.</textarea>
           document.getElementById('btnFormSaveAndLog').click();
         });
         document.getElementById('mobileSeeReceipt').addEventListener('click', function () {
-          document.getElementById('receiptPaperElement').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          var tab=document.getElementById('viewTabCreate');
+          setMobileReceiptStep(tab.getAttribute('data-mobile-receipt-step')==='preview'?'edit':'preview');
         });
         document.getElementById('mobileActiveHistory').addEventListener('click', function () { setMobileHistoryView('active'); });
         document.getElementById('mobileDeletedHistory').addEventListener('click', function () { setMobileHistoryView('deleted'); });
