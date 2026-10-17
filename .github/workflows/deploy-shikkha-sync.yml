@@ -1,0 +1,91 @@
+name: Deploy Shikkha Sync Worker (isolated)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-shikkha-sync:
+    if: github.repository == 'jawdatjr/shikkha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GH_BACKUP_TOKEN: ${{ secrets.SHIKKHA_GH_BACKUP_TOKEN }}
+      SALESMAN_KEYS: ${{ secrets.SHIKKHA_SALESMAN_KEYS }}
+      WORKER_NAME: shikkha-jawdatjr-offline-sync-2026
+
+    steps:
+      - name: Checkout Shikkha repository only
+        uses: actions/checkout@v4
+
+      - name: Validate configuration without printing secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for key in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID GH_BACKUP_TOKEN SALESMAN_KEYS; do
+            if [ -z "${!key:-}" ]; then
+              echo "::error::Missing GitHub Actions secret: $key"
+              exit 1
+            fi
+          done
+          python3 - <<'PY'
+          import json, os
+          obj=json.loads(os.environ["SALESMAN_KEYS"])
+          assert isinstance(obj,dict) and len(obj)>=2, "Need at least Owner and Salesman02 keys"
+          assert all(isinstance(name,str) and name.strip() and isinstance(key,str) and len(key)>=32 for name,key in obj.items()), "Keys must be unique 32+ character strings"
+          assert len(set(obj.values())) == len(obj), "Salesman keys must be distinct"
+          print("Private salesman key structure is valid (secret values are hidden).")
+          PY
+
+      - name: Protect existing Cloudflare Workers (create-only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" \
+            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/scripts/${WORKER_NAME}")
+          case "$status" in
+            404) echo "Target Worker does not exist; safe to create." ;;
+            200)
+              echo "::error::A Worker with this exact name already exists. Stopping without modifying it."
+              exit 1
+              ;;
+            *)
+              echo "::error::Cannot verify Worker isolation (HTTP $status); no changes made."
+              exit 1
+              ;;
+          esac
+
+      - name: Deploy new independent workers.dev Worker
+        working-directory: cloudflare-worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@4 deploy --name "$WORKER_NAME"
+
+      - name: Set scoped GitHub backup token as Worker secret
+        working-directory: cloudflare-worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf "%s" "$GH_BACKUP_TOKEN" | npx --yes wrangler@4 secret put GH_TOKEN --name "$WORKER_NAME"
+
+      - name: Set team salesman keys as Worker secret
+        working-directory: cloudflare-worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf "%s" "$SALESMAN_KEYS" | npx --yes wrangler@4 secret put SALESMAN_KEYS --name "$WORKER_NAME"
+
+      - name: Deployment summary
+        shell: bash
+        run: |
+          echo "## Shikkha Sync deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "New isolated Worker name: \`$WORKER_NAME\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "No routes or custom domains are configured. Existing accounting software was not targeted." >> "$GITHUB_STEP_SUMMARY"
+          echo "Copy your new workers.dev URL from the Wrangler deploy step into each phone's Shikkha Settings → Auto GitHub Backup." >> "$GITHUB_STEP_SUMMARY"
+          echo "Important: Deployment is not data synchronization. Verify a test receipt on both phones and in private GitHub data/ledger.json." >> "$GITHUB_STEP_SUMMARY"
