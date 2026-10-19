@@ -1169,6 +1169,20 @@
       #mobNavVerify,#mobNavSettings,#tabBtnVerify {display:none!important}
       #viewTabSettings #settingsSignatureMount .form-input{font-size:16px}
     }
+    /* Identifiable bKash receipt mark and quick preview theme selector. */
+    .receipt-bkash {display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:5px;font-size:12px;font-weight:900;color:#ad005d;overflow-wrap:anywhere}
+    .receipt-bkash[hidden] {display:none!important}
+    .bkash-brand-icon {background:#d50073;color:white;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;flex:none;font-size:17px;font-weight:900;line-height:1}
+    .preview-theme-circles {display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:7px;padding:7px 9px;border-radius:11px;background:#f3f8fa;border:1px solid #d9e6e9;margin:8px 0}
+    .preview-theme-circles button {width:28px;height:28px;min-height:28px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #bac9d0;cursor:pointer;touch-action:manipulation}
+    .preview-theme-circles button.active {box-shadow:0 0 0 3px #0b6774,0 0 0 5px white}
+    .settings-top-panel {border:1px solid #bcd8dc;border-radius:14px;background:#f6fbfd;padding:13px;margin-bottom:12px}
+    .settings-top-panel h3 {font-weight:900;font-size:15px;color:#0f4353;margin:0 0 10px}
+    .settings-manager-row {display:flex;align-items:center;justify-content:space-between;gap:7px;padding:9px;border-radius:9px;background:white;border:1px solid #e0eaee;margin:6px 0;font-size:13px;font-weight:700;overflow-wrap:anywhere}
+    .settings-manager-row .mini-action {border:1px solid #cad5e2;border-radius:8px;padding:5px 8px;min-width:32px;min-height:35px;background:#f1f7fa;font-size:12px}
+    .settings-manager-row .mini-action.danger {background:#fff1f2;color:#be123c}
+    .settings-manager-row:first-child {border-color:#0d9488;background:#ecfdf5}
+    .settings-top-panel .form-input {min-width:0}
   </style>
   <link rel="stylesheet" href="./travel-animation.css" />
 </head>
@@ -1473,7 +1487,7 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="inpSalesmanName">সেলসম্যান (Salesman)</label>
-              <input type="text" id="inpSalesmanName" class="form-input font-semibold" value="কাউন্টার ১" placeholder="সেলসম্যানের নাম" />
+              <select id="inpSalesmanName" class="form-select font-semibold" aria-label="সেলসম্যান নির্বাচন করুন"><option value="কাউন্টার ১">কাউন্টার ১</option></select>
             </div>
           </div>
 
@@ -1661,6 +1675,9 @@
           </div>
         </div>
 
+        <div id="previewThemeCircles" class="preview-theme-circles no-print" aria-label="রিসিপ্টের থিম নির্বাচন">
+          <span class="text-xs font-bold text-slate-700">🎨 থিম:</span>
+        </div>
         <div class="receipt-preview-wrapper">
           <!-- THE TRAVELS RECEIPT PAPER -->
           <div id="receiptPaperElement" class="receipt-paper layout-clean">
@@ -1714,6 +1731,10 @@
                   </div>
                   <div id="previewPhone2" class="text-xs sm:text-[13.5px] font-extrabold leading-snug font-mono" style="color: var(--theme-secondary);">
                     +880 1726-308068
+                  </div>
+                  <div id="previewBkash" class="receipt-bkash" hidden>
+                    <span class="bkash-brand-icon" aria-hidden="true">৳</span>
+                    <span>bKash:</span> <span id="previewBkashNumber"></span>
                   </div>
                   <div id="previewCompanyAddress" class="text-[11.5px] font-semibold leading-tight mt-0.5 max-w-[260px] whitespace-pre-line" style="color: var(--theme-text);">
                     Kumarshil mur (Kismat Medical)
@@ -2110,6 +2131,15 @@
          VIEW TAB 6: FULL-PAGE SETTINGS, LANGUAGE & GITHUB/PWA INSTALL
          ========================================================== -->
     <div id="viewTabSettings" class="hidden no-print">
+      <div id="settingsPriority" class="settings-top-panel">
+        <h3>👤 সেলসম্যান ম্যানেজার — প্রথম নামটি ডিফল্ট</h3>
+        <div class="flex gap-2">
+          <input type="text" id="inpAddSalesman" class="form-input" placeholder="সেলসম্যানের নাম লিখুন" maxlength="80" />
+          <button type="button" id="btnAddSalesman" class="btn btn-primary">+ যোগ</button>
+        </div>
+        <div id="settingsSalesmanList" class="mt-2"></div>
+      </div>
+      <div id="settingsPriorityPackages"></div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <!-- Left: Agency Branding, Language & Receipt Settings -->
         <section id="panelSettings" class="panel-card">
@@ -2123,6 +2153,7 @@
             </button>
           </div>
 
+          <details id="settingsLanguageDetails" class="settings-feature"><summary>🌐 ভাষা পরিবর্তন (Language) ▾</summary>
           <!-- Language Selector (Bangla & English Option) -->
           <div class="p-3.5 rounded-xl bg-sky-50 border border-sky-200 mb-4">
             <label class="form-label text-sky-950" for="selAppLanguage">🌐 অ্যাপের ভাষা নির্বাচন করুন (App Language — Bangla / English)</label>
@@ -2139,6 +2170,8 @@
               <option value="en">🇬🇧 English (ইংরেজি)</option>
             </select>
           </div>
+
+          </details>
 
           <div class="form-group">
             <label class="form-label" for="inpCompanyBn">প্রতিষ্ঠানের নাম — বাংলা (Company Name Bangla)</label>
@@ -2505,7 +2538,8 @@ Nearby Sadar Hospital Road.</textarea>
         themeId: 'teal-classic',
         layoutMode: 'clean',
         logoDataUrl: '',
-        bkashNumber: ''
+        bkashNumber: '',
+        salesmen: ['কাউন্টার ১']
       };
 
       // --- BILINGUAL DICTIONARY (Bangla & English) ---
@@ -3101,6 +3135,9 @@ Nearby Sadar Hospital Road.</textarea>
         document.getElementById('previewCompanyEn').textContent = s.companyEn || DEFAULT_SETTINGS.companyEn;
         document.getElementById('previewPhone1').textContent = s.phone1 || '';
         document.getElementById('previewPhone2').textContent = s.phone2 || '';
+        var bkNumber=String(s.bkashNumber||'').trim();
+        document.getElementById('previewBkash').hidden = !bkNumber;
+        document.getElementById('previewBkashNumber').textContent = bkNumber;
         document.getElementById('previewCompanyAddress').textContent = s.address || '';
         document.getElementById('previewReceiptBadge').textContent = s.receiptBadge || 'Money Receipt';
         document.getElementById('previewEventLabel').textContent = s.eventFieldLabel || 'Event Name:';
@@ -3610,7 +3647,12 @@ Nearby Sadar Hospital Road.</textarea>
         drawLines('OFFICIAL MONEY RECEIPT',63,63,245,1,20,'#ffffff',900);
         drawLines(s.companyBn || DEFAULT_SETTINGS.companyBn,52,130,795,2,49,'#ffffff',900,56);
         drawLines(s.companyEn || DEFAULT_SETTINGS.companyEn,52,237,800,1,25,'#c5f5f9',900);
-        drawLines([s.phone1,s.phone2].filter(Boolean).join('  •  '),52,279,795,1,21,'#e2f4f5',700);
+        drawLines([s.phone1,s.phone2].filter(Boolean).join('  •  '),52,276,795,1,21,'#e2f4f5',700);
+        if(s.bkashNumber){
+          ctx.fillStyle='#d50073';ctx.beginPath();ctx.roundRect(52,289,30,27,6);ctx.fill();
+          drawLines('৳',59,309,19,1,21,'#ffffff',900);
+          drawLines('bKash: '+String(s.bkashNumber),91,309,700,1,23,'#ffffff',900);
+        }
         field(45,332,390,115,'ইনভয়েস / Invoice',d.invoice,1,36);
         field(450,332,404,115,'তারিখ / Date',d.date,1,35);
         field(45,463,810,122,'যাত্রী / Customer Name',d.customerName||'—',2,37);
