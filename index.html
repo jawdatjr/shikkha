@@ -3725,8 +3725,11 @@ Nearby Sadar Hospital Road.</textarea>
         canvas.width=w;canvas.height=h;
         var ctx=canvas.getContext('2d');
         if(!ctx){showToast('রিসিপ্ট ছবি তৈরি করা যাচ্ছে না','⚠️');return;}
-        var teal=t.primary||'#008996', dark=t.secondary||'#005a63';
-        var ink='#103b42', soft='#f3fafb', line='#b6d9df';
+        var style=t.receiptStyle||'original';
+        var teal=t.primary||'#008996',dark=t.secondary||'#005a63';
+        var ink=style==='darkvip'?'#f8f5ec':style==='luxury'?'#6e4d1d':'#103b42';
+        var soft=style==='darkvip'?'#202e43':style==='luxury'?'#fffaf0':'#f3fafb';
+        var line=style==='darkvip'?'#5d6881':style==='luxury'?'#c9a96c':'#b6d9df';
         var font='"Noto Sans Bengali","Hind Siliguri",system-ui,sans-serif';
         function fontAt(size,weight){ctx.font=(weight||700)+' '+size+'px '+font;}
         function text(value,x,y,maxWidth,size,color,weight,alignment){
@@ -3771,24 +3774,85 @@ Nearby Sadar Hospital Road.</textarea>
           if(stroke){ctx.lineWidth=2;ctx.strokeStyle=stroke;ctx.stroke();}
         }
         function field(x,y,bw,bh,label,value,size,limit){
-          rounded(x,y,bw,bh,14,'#ffffff',line);
-          text(label,x+21,y+28,bw-42,19,dark,850);
-          wrapped(value,x+21,y+74,bw-42,limit||2,size||34,ink,850,(size||34)*1.2);
+          var pad=21, labelColor=dark;
+          if(style==='executive'){
+            rounded(x,y,bw,bh,10,'#ffffff','#a5bad7');
+            ctx.fillStyle=teal;ctx.fillRect(x,y+12,8,bh-24);
+          }else if(style==='luxury'){
+            rounded(x,y,bw,bh,3,'#fffdf5','#d6b875');
+            ctx.strokeStyle='#dcc695';ctx.lineWidth=1;ctx.beginPath();
+            ctx.moveTo(x+18,y+41);ctx.lineTo(x+bw-18,y+41);ctx.stroke();
+            pad=24;labelColor='#886425';
+          }else if(style==='boarding'){
+            rounded(x,y,bw,bh,6,'#ffffff','#b6a8dc');
+            ctx.save();ctx.strokeStyle='#a28ccf';ctx.lineWidth=1.5;ctx.setLineDash([6,7]);
+            ctx.beginPath();ctx.moveTo(x+11,y+43);ctx.lineTo(x+bw-11,y+43);ctx.stroke();ctx.restore();
+          }else if(style==='minimal'){
+            rounded(x,y,bw,bh,24,'#f8fdfe','#dcecef');
+            ctx.fillStyle='#e9f8fa';ctx.fillRect(x+1,y+20,4,bh-40);
+          }else if(style==='darkvip'){
+            rounded(x,y,bw,bh,12,'#1c2b41','#506581');
+            labelColor='#d4b979';
+          }else rounded(x,y,bw,bh,14,'#ffffff',line);
+          text(label,x+pad,y+28,bw-pad*2,19,labelColor,850);
+          wrapped(value,x+pad,y+74,bw-pad*2,limit||2,size||34,ink,850,(size||34)*1.2);
         }
-        // Ticket paper, soft graph texture, teal edge and detachable ticket decoration.
-        ctx.fillStyle='#f9fdfe';ctx.fillRect(0,0,w,h);
-        ctx.strokeStyle='#e5f2f4';ctx.lineWidth=1;
-        for(var gx=33;gx<w;gx+=28){ctx.beginPath();ctx.moveTo(gx,94);ctx.lineTo(gx,h-65);ctx.stroke();}
-        for(var gy=110;gy<h-65;gy+=28){ctx.beginPath();ctx.moveTo(19,gy);ctx.lineTo(w,gy);ctx.stroke();}
-        ctx.fillStyle=teal;ctx.fillRect(0,0,18,h);
-        ctx.strokeStyle='#ffffff';ctx.lineWidth=3;
-        ctx.setLineDash([8,10]);ctx.beginPath();ctx.moveTo(11,120);ctx.lineTo(11,h-70);ctx.stroke();ctx.setLineDash([]);
+        // Five truly distinct receipt templates; Original retains its original travel-paper design.
+        ctx.fillStyle=style==='darkvip'?'#10192b':style==='luxury'?'#fffcf5':style==='minimal'?'#ffffff':'#f9fdfe';
+        ctx.fillRect(0,0,w,h);
+        if(style!=='minimal'&&style!=='darkvip'&&style!=='luxury'){
+          ctx.strokeStyle=style==='original'?'#e5f2f4':style==='executive'?'#edf3fb':'#efecf8';ctx.lineWidth=1;
+          for(var gx=33;gx<w;gx+=28){ctx.beginPath();ctx.moveTo(gx,94);ctx.lineTo(gx,h-65);ctx.stroke();}
+          for(var gy=110;gy<h-65;gy+=28){ctx.beginPath();ctx.moveTo(19,gy);ctx.lineTo(w,gy);ctx.stroke();}
+        }
+        ctx.fillStyle=teal;ctx.fillRect(0,0,style==='boarding'?28:18,h);
+        if(style==='original'){
+          ctx.strokeStyle='#ffffff';ctx.lineWidth=3;ctx.setLineDash([8,10]);
+          ctx.beginPath();ctx.moveTo(11,120);ctx.lineTo(11,h-70);ctx.stroke();ctx.setLineDash([]);
+        }else if(style==='executive'){
+          ctx.fillStyle='#1f568a';ctx.fillRect(18,0,13,h);
+          ctx.fillStyle='#d9e9fb';ctx.fillRect(31,0,5,h);
+          ctx.strokeStyle='#d8e8ff';ctx.lineWidth=3;
+          for(var a=0;a<4;a++){ctx.beginPath();ctx.moveTo(610+a*60,0);ctx.lineTo(475+a*60,100);ctx.stroke();}
+        }else if(style==='luxury'){
+          ctx.strokeStyle='#cfab64';ctx.lineWidth=3;ctx.strokeRect(34,108,830,1680);
+          ctx.lineWidth=1.5;ctx.strokeRect(39,113,820,1670);
+          for(var k=0;k<4;k++){
+            var xx=k%2===0?47:848, yy=k<2?124:1774;
+            ctx.beginPath();ctx.arc(xx,yy,6,0,Math.PI*2);ctx.stroke();
+          }
+          ctx.fillStyle='#d2b171';ctx.fillRect(19,0,8,h);
+        }else if(style==='boarding'){
+          ctx.fillStyle='#9a85d0';ctx.fillRect(29,0,5,h);
+          ctx.fillStyle='#ffffff';
+          for(var y=135;y<h-95;y+=35){ctx.beginPath();ctx.arc(27,y,8,0,Math.PI*2);ctx.fill();}
+          ctx.save();ctx.strokeStyle='#7b5db8';ctx.lineWidth=3;ctx.setLineDash([10,12]);
+          ctx.beginPath();ctx.moveTo(50,1159);ctx.lineTo(854,1159);ctx.stroke();ctx.restore();
+          ctx.fillStyle='#d9cff5';
+          for(var i=0;i<16;i++)ctx.fillRect(60+i*47,1162,i%3===0?5:2,11);
+        }else if(style==='minimal'){
+          ctx.fillStyle='#e4f3f6';ctx.fillRect(18,0,4,h);
+          ctx.strokeStyle='#e4eff2';ctx.lineWidth=2;
+          ctx.beginPath();ctx.moveTo(47,367);ctx.lineTo(854,367);ctx.stroke();
+        }else if(style==='darkvip'){
+          ctx.fillStyle='#d0b16a';ctx.fillRect(18,0,4,h);
+          ctx.strokeStyle='#344760';ctx.lineWidth=3;ctx.strokeRect(37,112,826,1668);
+          ctx.save();ctx.globalAlpha=.11;ctx.fillStyle='#d5bc84';
+          for(var bx=0;bx<900;bx+=85){ctx.beginPath();ctx.arc(bx+25,900,90,0,Math.PI*2);ctx.fill();}
+          ctx.restore();
+        }
         // The travel voucher banner and agency identity are from the HTML preview design.
-        ctx.fillStyle=teal;ctx.fillRect(18,0,w-18,100);
-        text('✈   TOUR & TRAVEL BOOKING VOUCHER',54,44,770,21,'#ffffff',900);
+        ctx.fillStyle=style==='executive'?'#0c2146':style==='darkvip'?'#0a1223':style==='luxury'?'#775521':teal;
+        ctx.fillRect(18,0,w-18,100);
+        if(style==='minimal'){ctx.fillStyle='#128596';ctx.fillRect(18,93,w-18,7);}
+        if(style==='boarding'){
+          ctx.strokeStyle='#e8dafa';ctx.lineWidth=2;ctx.setLineDash([4,6]);
+          ctx.beginPath();ctx.moveTo(450,11);ctx.lineTo(450,88);ctx.stroke();ctx.setLineDash([]);
+        }
+        text(style==='executive'?'✈   EXECUTIVE TRAVEL ACCOUNT':style==='luxury'?'✦   LUXURY TOUR RECEIPT':style==='boarding'?'✈   PREMIUM BOARDING PASS':style==='minimal'?'✈   MODERN TRAVEL RECEIPT':style==='darkvip'?'✦   VIP TRAVEL DOCUMENT':'✈   TOUR & TRAVEL BOOKING VOUCHER',54,44,770,21,'#ffffff',900);
         text('OFFICIAL MONEY RECEIPT',54,76,720,25,'#ffffff',900);
         text('BOOKING REF:  #'+(d.invoice||'—'),w-46,91,405,17,'#e0faff',750,'right');
-        rounded(45,118,810,244,16,'#ffffff',line);
+        rounded(45,118,810,244,style==='luxury'?4:style==='minimal'?26:16,style==='darkvip'?'#202e43':style==='luxury'?'#fffbf0':'#ffffff',line);
         rounded(68,142,64,64,15,teal);
         text('✈',82,187,45,41,'#ffffff',900);
         wrapped(s.companyBn||DEFAULT_SETTINGS.companyBn,152,181,672,2,43,dark,900,50);
@@ -3812,9 +3876,9 @@ Nearby Sadar Hospital Road.</textarea>
         field(45,1042,810,112,'যাত্রী ও সিট / Passenger • Seats',
           (d.paxOrQty||'—')+' জন  •  '+(d.seatNumbers||'সিট নির্ধারিত নয়'),30,1);
 
-        rounded(45,1170,810,255,17,'#ffffff',line);
+        rounded(45,1170,810,255,style==='luxury'?3:17,style==='darkvip'?'#202e43':style==='luxury'?'#fffbef':'#ffffff',line);
         text('বুকিংয়ের হিসাব / PAYMENT SUMMARY',68,1208,754,24,dark,900);
-        rounded(62,1226,776,81,12,'#e9f8fa');
+        rounded(62,1226,776,81,12,style==='darkvip'?'#30475c':style==='luxury'?'#fbefce':'#e9f8fa');
         text('মোট বিল / TOTAL',82,1259,390,21,dark,850);
         text((formatCurrencyNumber(d.total,d.useBangla!==false))+' ৳',815,1287,380,39,ink,900,'right');
         rounded(62,1320,369,86,12,'#edfdf4');
@@ -3826,13 +3890,14 @@ Nearby Sadar Hospital Road.</textarea>
         field(45,1441,810,108,'পেমেন্ট মাধ্যম / Paid via',
           (d.paymentMethod||'Cash')+(d.trxId?'  •  TrxID: '+d.trxId:'')+
           (Number(d.discount)>0?'  •  ছাড়: '+formatCurrencyNumber(d.discount,d.useBangla!==false)+' ৳':''),29,1);
-        rounded(45,1567,810,209,15,'#ffffff',line);
+        rounded(45,1567,810,209,style==='luxury'?3:15,style==='darkvip'?'#202e43':'#ffffff',line);
         text('রিসিপ্ট প্রদানকারী / Issued by',68,1608,650,22,dark,900);
         wrapped(d.salesman||'—',68,1655,490,1,31,ink,850);
         text('নিরাপত্তা কোড / Security Code',68,1693,570,18,dark,800);
         text(d.securityCode||'—',68,1726,585,23,teal,850);
-        ctx.strokeStyle='#a1bac4';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(638,1734);ctx.lineTo(816,1734);ctx.stroke();
-        text('Authorized Signature',650,1753,174,17,'#526b79',700);
+        ctx.strokeStyle=style==='darkvip'?'#8499b7':'#a1bac4';ctx.lineWidth=2;
+        ctx.beginPath();ctx.moveTo(474,1734);ctx.lineTo(654,1734);ctx.stroke();
+        text('Signature',493,1753,152,17,style==='darkvip'?'#cbd5e1':'#526b79',700);
         if(d.showStamp!==false){
           ctx.save();ctx.translate(735,1597);ctx.rotate(-0.10);
           ctx.strokeStyle=d.due<=0?'#047857':'#be123c';ctx.lineWidth=3;
@@ -3845,7 +3910,7 @@ Nearby Sadar Hospital Road.</textarea>
         var finish=function(){callback(canvas,d);};
         if(appState.signatureDataUrl){
           var im=new Image();
-          im.onload=function(){try{ctx.drawImage(im,649,1645,164,76);}catch(e){}finish();};
+          im.onload=function(){try{ctx.drawImage(im,479,1645,164,76);}catch(e){}finish();};
           im.onerror=finish;
           im.src=appState.signatureDataUrl;
         } else finish();
