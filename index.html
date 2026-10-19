@@ -2827,7 +2827,11 @@ Nearby Sadar Hospital Road.</textarea>
           };
           img.src = savedSig;
         } else {
-          drawDefaultSampleSignature();
+          // Never invent a company signature. One explicit saved signature is reused for all receipts.
+          sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+          hasSignatureStrokes = false;
+          appState.signatureDataUrl = '';
+          syncSignatureToPreview();
         }
 
         function getPos(e) {
@@ -2861,8 +2865,12 @@ Nearby Sadar Hospital Road.</textarea>
           if (!isDrawingSig) return;
           e.preventDefault();
           isDrawingSig = false;
-          appState.signatureDataUrl = sigCanvas.toDataURL('image/png');
-          safeSetStorage(STORAGE_SIGNATURE_KEY, appState.signatureDataUrl);
+          var signedImage = sigCanvas.toDataURL('image/png');
+          if (!safeSetStorage(STORAGE_SIGNATURE_KEY, signedImage)) {
+            showToast('সিগনেচার সেভ হয়নি। ফোনের স্টোরেজ পরীক্ষা করুন।', '⚠️');
+            return;
+          }
+          appState.signatureDataUrl = signedImage;
           syncSignatureToPreview();
         }
 
@@ -4914,11 +4922,16 @@ Nearby Sadar Hospital Road.</textarea>
         });
 
         document.getElementById('btnClearSignature').addEventListener('click', function () {
+          if (!confirm('সংরক্ষিত সিগনেচার মুছবেন? এরপর রিসিপ্টে স্বাক্ষর থাকবে না।')) return;
+          if (!safeSetStorage(STORAGE_SIGNATURE_KEY, '')) {
+            showToast('সিগনেচার মুছা সেভ হয়নি', '⚠️');
+            return;
+          }
           sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
           hasSignatureStrokes = false;
           appState.signatureDataUrl = '';
-          safeSetStorage(STORAGE_SIGNATURE_KEY, '');
           syncSignatureToPreview();
+          showToast('সিগনেচার সরানো হয়েছে', '✓');
         });
 
         document.getElementById('inpSignatureUpload').addEventListener('change', function (e) {
@@ -4930,11 +4943,15 @@ Nearby Sadar Hospital Road.</textarea>
             img.onload = function () {
               sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
               sigCtx.drawImage(img, 0, 0, sigCanvas.width, sigCanvas.height);
+              var uploadedSignature = sigCanvas.toDataURL('image/png');
+              if (!safeSetStorage(STORAGE_SIGNATURE_KEY, uploadedSignature)) {
+                showToast('সিগনেচার ফোনে সেভ হয়নি, ছোট ছবি ব্যবহার করুন', '⚠️');
+                return;
+              }
               hasSignatureStrokes = true;
-              appState.signatureDataUrl = sigCanvas.toDataURL('image/png');
-              safeSetStorage(STORAGE_SIGNATURE_KEY, appState.signatureDataUrl);
+              appState.signatureDataUrl = uploadedSignature;
               syncSignatureToPreview();
-              showToast('স্বাক্ষর আপলোড হয়েছে!', '✍️');
+              showToast('স্বাক্ষর সেভ হয়েছে। পরের রিসিপ্টেও থাকবে!', '✍️');
             };
             img.src = ev.target.result;
           };
@@ -4946,19 +4963,29 @@ Nearby Sadar Hospital Road.</textarea>
           if (!file) return;
           var reader = new FileReader();
           reader.onload = function (ev) {
+            var previousLogo = appState.settings.logoDataUrl;
             appState.settings.logoDataUrl = ev.target.result;
-            saveSettingsToStorage();
+            if (!saveSettingsToStorage()) {
+              appState.settings.logoDataUrl = previousLogo;
+              showToast('লোগো সেভ হয়নি, ছোট ছবি ব্যবহার করুন', '⚠️');
+              return;
+            }
             updateLiveReceipt();
-            showToast('এজেন্সি লোগো যুক্ত হয়েছে!', '🖼️');
+            showToast('এজেন্সি লোগো সেভ হয়েছে!', '🖼️');
           };
           reader.readAsDataURL(file);
         });
 
         document.getElementById('btnRemoveLogo').addEventListener('click', function () {
+          var previousLogo = appState.settings.logoDataUrl;
           appState.settings.logoDataUrl = '';
-          saveSettingsToStorage();
+          if (!saveSettingsToStorage()) {
+            appState.settings.logoDataUrl = previousLogo;
+            showToast('লোগো সরানো সেভ হয়নি', '⚠️');
+            return;
+          }
           updateLiveReceipt();
-          showToast('লোগো সরান চালু করা হয়েছে।', '✈️');
+          showToast('লোগো সরানো হয়েছে।', '✈️');
         });
 
         document.getElementById('btnResetSettings').addEventListener('click', function () {
