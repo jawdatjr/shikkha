@@ -119,49 +119,40 @@ function renderTicket(options,callback){
  if(d.paymentMethod==='Rocket')txt('Rocket ✓',352,318,8.5,deep,850,85);
  if(d.trxId)txt('Trx: '+d.trxId,527,318,8.3,deep,800,155,'right');
  line(25,326,531,326,edge,.9);
- // Real QR, rendered with the visual footprint of the original small square.
+ // Compact footer tailored to phone receipt viewing: one scannable QR replaces the barcode.
  function drawQr(){
    if(typeof options.qrcode!=='function')return;
    try{
      var qr=options.qrcode(0,'M');
      qr.addData('INV:'+String(d.invoice||'')+'\nSEC:'+String(d.securityCode||'')+'\nAMT:'+String(Number(d.total)||0),'Byte');
      qr.make();
-     var n=qr.getModuleCount(),size=38,module=size/(n+4);
-     rect(24,340,40,40,'#ffffff');
-     c.fillStyle=deep;
+     var n=qr.getModuleCount(),quiet=4,box=51,step=box/(n+quiet*2);
+     // Rounded white QR ticket panel with enough quiet zone for mobile scanning.
+     rr(77,332,57,55,5,'#ffffff','#cbdfe4',.7);
+     c.fillStyle='#073d49';
      for(var y=0;y<n;y++)for(var x=0;x<n;x++)if(qr.isDark(y,x)){
-       c.fillRect(25+(x+2)*module,341+(y+2)*module,module+.04,module+.04);
+       c.fillRect(80+(x+quiet)*step,334+(y+quiet)*step,step+.008,step+.008);
      }
    }catch(err){if(window.console)console.warn('Receipt QR unavailable:',err);}
  }
  drawQr();
- // decorative ticket barcode; like original screenshot, not a payment barcode.
- var seed=String(d.securityCode||'AS-TRAVEL')+String(d.invoice||'');
- var bx=79;
- for(var bi=0;bi<47;bi++){
-   var code=seed.charCodeAt(bi%seed.length)+bi*13;
-   var ww=code%3===0?1.8:code%3===1?1.2:.6;
-   rect(bx,342,ww,14,deep);
-   bx+=ww+(bi%3?1:.5);
-   if(bx>144)break;
- }
- txt(String(d.securityCode||'—'),70,369,7.1,dark,900,160);
- txt('VERIFIED TRAVEL PASS',70,378,6.8,'#64748b',850,160);
- // Only requested addition to the old layout:
- txt('Issued By: '+String(d.salesman||'—'),70,390,7.7,deep,900,160);
- // Rotated official paid/due seal
+ txt(String(d.securityCode||'—'),143,348,7.4,dark,900,209);
+ txt('VERIFIED TRAVEL PASS',143,361,7.0,'#64748b',850,180);
+ txt('Issued By: '+String(d.salesman||'—'),143,376,8,deep,900,213);
+ // No separate seal column. The official seal is a light watermark BEHIND the
+ // saved real signature and signature line in the right-hand section.
  if(d.showStamp!==false){
-   c.save();c.translate(278,358);c.rotate(-.065);
-   rr(-58,-19,116,42,3,'#ffffff',main,.9);
-   txt((s.companyEn||'TRAVEL AGENCY').toUpperCase(),0,-10,6.3,main,900,108,'center');
-   rr(-36,-4,72,15,3,'#fff2dc');
-   txt(d.due>0?'BOOKED • DUE: '+money(d.due):'BOOKED • DUE: 0',0,6,7.2,'#a14a23',900,69,'center');
-   txt('ISSUED: '+String(d.date||''),0,17,6.2,deep,850,109,'center');
+   c.save();c.translate(472,358);c.rotate(-.07);c.globalAlpha=.16;
+   rr(-57,-20,114,41,3,null,main,1.5);
+   txt((s.companyEn||'TRAVEL AGENCY').toUpperCase(),0,-9,6.2,main,900,107,'center');
+   rr(-37,-4,74,14,2,null,main,.7);
+   txt(d.due>0?'BOOKED • DUE':'FULLY PAID',0,6,7,deep,900,70,'center');
+   txt('ISSUED: '+String(d.date||''),0,17,6,deep,850,109,'center');
    c.restore();
  }
- // Signature in the same bottom-right section of the old receipt.
- line(415,376,530,376,'#46849a',.8);
- txt(s.signatoryLabel||'কর্তৃপক্ষের স্বাক্ষর (Authorized Signature)',529,383,7.2,deep,900,146,'right');
+ // The signatory remains readable even over the translucent seal.
+ line(417,378,530,378,'#46849a',.8);
+ txt(s.signatoryLabel||'কর্তৃপক্ষের স্বাক্ষর (Authorized Signature)',529,387,7.1,deep,900,144,'right');
  // anti-copy microline and dark-teal footer
  rect(13,397,536,8,'#e3f4f7');
  txt(('ASHIK SHIKKHA POS • '+(s.companyEn||'TRAVELLERS')+' • '+String(d.securityCode||'')+' • VERIFIED • ').repeat(4),15,402,4.4,main,700,533);
@@ -188,7 +179,7 @@ function renderTicket(options,callback){
    im.src=url;
  }
  imageAsset(s.logoDataUrl,28,48,30,30);
- imageAsset(options.signatureDataUrl,427,341,95,32);
+ imageAsset(options.signatureDataUrl,434,342,91,29);
  finish();
 }
 window.ShikkhaReceiptTicket={render:renderTicket};
