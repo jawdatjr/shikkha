@@ -1100,6 +1100,59 @@
       #viewTabCreate .receipt-preview-section > .p-3:first-child > .flex:last-child button { font-size:10px; }
     }
 
+
+    /* Mobile dashboard contrast safeguard — independent of Tailwind gradient variables.
+       These are intentionally scoped to the old dashboard elements only. */
+    #viewTabDashboard > div:first-child {
+      background: linear-gradient(125deg, #0f253e 0%, #0d6673 52%, #0f172a 100%) !important;
+      background-color: #0f253e !important;
+      color: #fff !important;
+    }
+    #viewTabDashboard > div:first-child #dashHeroTitle,
+    #viewTabDashboard > div:first-child #dashLiveClock,
+    #viewTabDashboard > div:first-child > div:first-child > div:first-child,
+    #viewTabDashboard > div:first-child > div:first-child > h2 {
+      color: #fff !important;
+    }
+    #viewTabDashboard > div:first-child #dashHeroSub { color: #ddf8ff !important; }
+    #viewTabDashboard > div:first-child #btnDashNewBooking {
+      color: #0f172a !important; background: #fff !important;
+    }
+    #viewTabDashboard > div:first-child #btnDashAddExpense {
+      color: #fff !important; background: #c41f4f !important;
+    }
+    #viewTabDashboard > div:first-child #btnDashViewDueList {
+      color: #0f172a !important; background: #fcd34d !important;
+    }
+    #dashboardKpiGrid > .kpi-card:nth-child(3) {
+      background: linear-gradient(135deg, #073047 0%, #0e5367 65%, #0f172a 100%) !important;
+      background-color: #0b354b !important;
+      color: #fff !important;
+      border-color: #1b8fa3 !important;
+    }
+    #dashboardKpiGrid > .kpi-card:nth-child(3) [class*="text-cyan"],
+    #dashboardKpiGrid > .kpi-card:nth-child(3) .text-white {
+      color: #e1fbff !important;
+    }
+    #dashboardKpiGrid > .kpi-card:nth-child(3) #dashKpiNetCurrentAmount {
+      color: #fff !important;
+    }
+    @media screen and (max-width: 767px) {
+      #viewTabDashboard > div:first-child {
+        box-shadow: 0 8px 24px rgba(2,27,45,.19) !important;
+        border: 1px solid rgba(45,212,191,.22);
+        padding: 17px !important;
+      }
+      #viewTabDashboard > div:first-child #dashHeroTitle {
+        font-size: 19px !important; line-height: 1.45 !important;
+      }
+      #viewTabDashboard > div:first-child #dashHeroSub {
+        font-size: 12px !important; line-height: 1.6 !important;
+      }
+      #dashboardKpiGrid > .kpi-card:nth-child(3) {
+        min-height: 112px;
+      }
+    }
   </style>
   <link rel="stylesheet" href="./travel-animation.css" />
 </head>
