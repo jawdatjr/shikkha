@@ -5437,9 +5437,10 @@ Nearby Sadar Hospital Road.</textarea>
         var clearButton = document.getElementById('btnClearSignature');
         var signatureUpload = document.getElementById('inpSignatureUpload');
         if (mount && signatureCanvas && clearButton && signatureUpload) {
-          mount.appendChild(clearButton.parentElement);
-          mount.appendChild(signatureCanvas.parentElement);
-          mount.appendChild(signatureUpload.parentElement);
+          // Move the WHOLE signature settings card, including stamp/QR/watermark
+          // toggles. Keeping the original elements retains all existing listeners.
+          var signatureCard = clearButton.parentElement.parentElement;
+          mount.appendChild(signatureCard);
         }
 
         var v = document.getElementById('viewTabVerify');
