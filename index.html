@@ -5392,11 +5392,8 @@ Nearby Sadar Hospital Road.</textarea>
       });
     })();
   </script>
-  <!-- Mobile-only touring postcard visible above the bottom tabs; no POS interactions/data access. -->
-  <div id="shikkhaTravelTourBar" class="no-print" aria-hidden="true">
-    <canvas id="groupTravelStoryCanvas"></canvas>
-    <div id="shikkhaTourTitle">✈️ বাংলাদেশের সুন্দর পর্যটন স্পট ঘুরে দেখি</div>
-  </div>
-  <script src="./mobile-travel-strip.js" defer></script>
+  <!-- Original HTML-inspired full-screen tour: no place names, no click interception. -->
+  <canvas id="groupTravelStoryCanvas" class="no-print" aria-hidden="true"></canvas>
+  <script src="./travel-animation.js" defer></script>
 </body>
 </html>
