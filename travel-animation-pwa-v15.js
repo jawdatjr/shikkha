@@ -15,9 +15,11 @@
       var tourErrors = 0;
       function safeRender(now, forced) {
         if (document.hidden) return;
-        now = Number.isFinite(now) ? now : Date.now();
-        if (!forced && lastRenderTime && now - lastRenderTime < 33) return; // ~30 fps cap for installed PWA
-        lastRenderTime = now;
+        // requestAnimationFrame supplies a performance-relative timestamp while
+        // the watchdog supplies epoch milliseconds. Use one clock for BOTH drivers.
+        var wallTime = Date.now();
+        if (!forced && lastRenderTime && wallTime - lastRenderTime < 33) return;
+        lastRenderTime = wallTime;
         try {
           updateAndRender();
           // Only one full-scene redraw per tick; avoids unnecessary battery and CPU load.
