@@ -3727,25 +3727,42 @@ Nearby Sadar Hospital Road.</textarea>
       // Genuine, fully offline QR. Encodes only receipt reference, amount and local receipt code;
       // scanning displays those details, but does not by itself authenticate a cloud record.
       function drawPremiumReceiptQR(ctx,d,x,y,size) {
-        if(typeof qrcode!=='function') {
-          if(window.console)console.warn('Offline QR library not ready');
+        if(typeof qrcode!=='function'){
+          if(window.console) console.warn('Offline QR library not ready');
           return false;
         }
-        try {
+        try{
           var qr=qrcode(0,'M');
+          // Keep the QR genuinely scannable: invoice, amount and security code.
           var value='ASHIK SHIKKHA TRAVEL RECEIPT\nINV: '+String(d.invoice||'').slice(0,90)+
             '\nAMOUNT: '+String(Number(d.total)||0)+
             '\nSEC: '+String(d.securityCode||'').slice(0,90);
           qr.addData(value,'Byte');
           qr.make();
-          var n=qr.getModuleCount(),step=size/(n+8);
+          var n=qr.getModuleCount(), quiet=4;
+          // Whole-number modules prevent blurry/uneven pseudo-QR edges.
+          var moduleSize=Math.max(1,Math.floor(size/(n+quiet*2)));
+          var drawn=moduleSize*(n+quiet*2);
+          var startX=Math.round(x+(size-drawn)/2);
+          var startY=Math.round(y+(size-drawn)/2);
           ctx.save();
-          ctx.fillStyle='#fff';ctx.fillRect(x-4,y-4,size+8,size+8);
-          ctx.fillStyle='#0c1b2a';
+          ctx.shadowColor='rgba(15,23,42,.10)';
+          ctx.shadowBlur=7;
+          ctx.shadowOffsetY=2;
+          ctx.fillStyle='#ffffff';
+          ctx.beginPath();
+          ctx.roundRect(x-8,y-8,size+16,size+16,11);
+          ctx.fill();
+          ctx.shadowBlur=0;
+          ctx.shadowOffsetY=0;
+          ctx.lineWidth=1.2;
+          ctx.strokeStyle='#cad9e0';
+          ctx.beginPath();
+          ctx.roundRect(x-8,y-8,size+16,size+16,11);
+          ctx.stroke();
+          ctx.fillStyle='#132333';
           for(var r=0;r<n;r++)for(var c=0;c<n;c++)if(qr.isDark(r,c)){
-            var x1=Math.floor(x+(c+4)*step),y1=Math.floor(y+(r+4)*step);
-            var x2=Math.ceil(x+(c+5)*step),y2=Math.ceil(y+(r+5)*step);
-            ctx.fillRect(x1,y1,x2-x1,y2-y1);
+            ctx.fillRect(startX+(c+quiet)*moduleSize,startY+(r+quiet)*moduleSize,moduleSize,moduleSize);
           }
           ctx.restore();
           return true;
@@ -3934,10 +3951,10 @@ Nearby Sadar Hospital Road.</textarea>
         text('রিসিপ্ট প্রদানকারী / Issued by',68,1608,650,22,dark,900);
         wrapped(d.salesman||'—',68,1655,490,1,31,ink,850);
         text('নিরাপত্তা কোড / Security Code',68,1693,570,18,dark,800);
-        text(d.securityCode||'—',68,1726,585,23,teal,850);
+        text(d.securityCode||'—',68,1726,453,23,teal,850);
         ctx.strokeStyle=style==='darkvip'?'#8499b7':'#a1bac4';ctx.lineWidth=2;
-        ctx.beginPath();ctx.moveTo(474,1734);ctx.lineTo(654,1734);ctx.stroke();
-        text('Signature',493,1753,152,17,style==='darkvip'?'#cbd5e1':'#526b79',700);
+        ctx.beginPath();ctx.moveTo(674,1734);ctx.lineTo(834,1734);ctx.stroke();
+        text('Signature',706,1753,122,17,style==='darkvip'?'#cbd5e1':'#526b79',700);
         if(d.showStamp!==false){
           ctx.save();ctx.translate(735,1597);ctx.rotate(-0.10);
           ctx.strokeStyle=d.due<=0?'#047857':'#be123c';ctx.lineWidth=3;
@@ -3947,13 +3964,13 @@ Nearby Sadar Hospital Road.</textarea>
         }
         // Every premium receipt style, including Original Teal, displays the same
         // scannable local receipt QR inside a generous white quiet zone.
-        drawPremiumReceiptQR(ctx,d,679,1618,156);
+        drawPremiumReceiptQR(ctx,d,545,1628,106);
         ctx.fillStyle=teal;ctx.fillRect(18,h-72,w-18,72);
         text(s.footerNotice||'Advance Money is not Refundable',53,h-28,785,23,'#ffffff',850);
         var finish=function(){callback(canvas,d);};
         if(appState.signatureDataUrl){
           var im=new Image();
-          im.onload=function(){try{ctx.drawImage(im,479,1645,164,76);}catch(e){}finish();};
+          im.onload=function(){try{ctx.drawImage(im,678,1648,148,70);}catch(e){}finish();};
           im.onerror=finish;
           im.src=appState.signatureDataUrl;
         } else finish();
