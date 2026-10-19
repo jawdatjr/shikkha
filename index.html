@@ -3715,6 +3715,37 @@ Nearby Sadar Hospital Road.</textarea>
 
       // CUSTOMER RECEIPT: large-type portrait image optimized for WhatsApp / phone screens.
       // Separate from the in-app HTML preview and legacy landscape canvas; avoids tiny PDF text.
+      // Genuine, fully offline QR. Encodes only receipt reference, amount and local receipt code;
+      // scanning displays those details, but does not by itself authenticate a cloud record.
+      function drawPremiumReceiptQR(ctx,d,x,y,size) {
+        if(typeof qrcode!=='function') {
+          if(window.console)console.warn('Offline QR library not ready');
+          return false;
+        }
+        try {
+          var qr=qrcode(0,'M');
+          var value='ASHIK SHIKKHA TRAVEL RECEIPT\nINV: '+String(d.invoice||'').slice(0,90)+
+            '\nAMOUNT: '+String(Number(d.total)||0)+
+            '\nSEC: '+String(d.securityCode||'').slice(0,90);
+          qr.addData(value,'Byte');
+          qr.make();
+          var n=qr.getModuleCount(),step=size/(n+8);
+          ctx.save();
+          ctx.fillStyle='#fff';ctx.fillRect(x-4,y-4,size+8,size+8);
+          ctx.fillStyle='#0c1b2a';
+          for(var r=0;r<n;r++)for(var c=0;c<n;c++)if(qr.isDark(r,c)){
+            var x1=Math.floor(x+(c+4)*step),y1=Math.floor(y+(r+4)*step);
+            var x2=Math.ceil(x+(c+5)*step),y2=Math.ceil(y+(r+5)*step);
+            ctx.fillRect(x1,y1,x2-x1,y2-y1);
+          }
+          ctx.restore();
+          return true;
+        }catch(err){
+          if(window.console)console.warn('QR render unavailable',err);
+          return false;
+        }
+      }
+
       // Unified renderer: the exact same canvas is shown in Preview and exported to PNG/PDF.
       // Its visual structure follows the teal travel voucher preview; all fields are retained.
       function renderCustomerReceiptToCanvas(receiptData, callback) {
@@ -3726,7 +3757,7 @@ Nearby Sadar Hospital Road.</textarea>
         var ctx=canvas.getContext('2d');
         if(!ctx){showToast('রিসিপ্ট ছবি তৈরি করা যাচ্ছে না','⚠️');return;}
         var style=t.receiptStyle||'original';
-        var teal=t.primary||'#008996',dark=t.secondary||'#005a63';
+        var teal=t.primary||'#008996',dark=style==='darkvip'?'#d7c48e':(t.secondary||'#005a63');
         var ink=style==='darkvip'?'#f8f5ec':style==='luxury'?'#6e4d1d':'#103b42';
         var soft=style==='darkvip'?'#202e43':style==='luxury'?'#fffaf0':'#f3fafb';
         var line=style==='darkvip'?'#5d6881':style==='luxury'?'#c9a96c':'#b6d9df';
@@ -3905,6 +3936,9 @@ Nearby Sadar Hospital Road.</textarea>
           text(d.due<=0?'FULLY PAID':'DUE',-76,4,155,20,d.due<=0?'#047857':'#be123c',900);
           ctx.restore();
         }
+        // Every premium receipt style, including Original Teal, displays the same
+        // scannable local receipt QR inside a generous white quiet zone.
+        drawPremiumReceiptQR(ctx,d,679,1618,156);
         ctx.fillStyle=teal;ctx.fillRect(18,h-72,w-18,72);
         text(s.footerNotice||'Advance Money is not Refundable',53,h-28,785,23,'#ffffff',850);
         var finish=function(){callback(canvas,d);};
