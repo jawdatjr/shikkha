@@ -3699,118 +3699,142 @@ Nearby Sadar Hospital Road.</textarea>
 
       // CUSTOMER RECEIPT: large-type portrait image optimized for WhatsApp / phone screens.
       // Separate from the in-app HTML preview and legacy landscape canvas; avoids tiny PDF text.
+      // Unified renderer: the exact same canvas is shown in Preview and exported to PNG/PDF.
+      // Its visual structure follows the teal travel voucher preview; all fields are retained.
       function renderCustomerReceiptToCanvas(receiptData, callback) {
         var d = receiptData || getReceiptFormData();
-        var s = appState.settings;
-        var t = getCurrentTheme();
-        var w = 900, h = 1870;
+        var s = appState.settings, t = getCurrentTheme();
         var canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
-        var ctx = canvas.getContext('2d');
-        var ink = '#15263b', light = '#eff5f8';
-        var fontFamily = '"Noto Sans Bengali", "Hind Siliguri", system-ui, sans-serif';
-        var currency = function(n) { return formatCurrencyNumber(n, d.useBangla !== false) + ' ৳'; };
-        function setFont(size, weight) { ctx.font = (weight || 700) + ' ' + size + 'px ' + fontFamily; }
-        function breakLines(str, maxWidth, maxLines, size, weight) {
-          var src = String(str == null ? '' : str).trim() || '—';
-          setFont(size, weight);
-          var words = src.replace(/\r/g, '').split(/(\s+)/);
-          var rows = [], row = '';
-          function flush() { if (row.trim()) rows.push(row.trim()); row = ''; }
-          for (var i=0;i<words.length;i++) {
-            var word = words[i];
-            if (word.indexOf('\n') >= 0) { var segments=word.split('\n'); for(var j=0;j<segments.length;j++){ if(j)flush(); if(segments[j]){ if(ctx.measureText(row+segments[j]).width>maxWidth && row)flush(); row+=segments[j]; } } continue; }
-            if(ctx.measureText(row + word).width <= maxWidth) { row += word; continue; }
-            if(row.trim()) flush();
-            if(ctx.measureText(word).width <= maxWidth){ row=word.trimStart(); continue; }
-            var glyphs = Array.from(word);
-            for(var g=0;g<glyphs.length;g++){ if(ctx.measureText(row+glyphs[g]).width>maxWidth && row)flush(); row+=glyphs[g]; }
+        var w=900,h=1870;
+        canvas.width=w;canvas.height=h;
+        var ctx=canvas.getContext('2d');
+        if(!ctx){showToast('রিসিপ্ট ছবি তৈরি করা যাচ্ছে না','⚠️');return;}
+        var teal=t.primary||'#008996', dark=t.secondary||'#005a63';
+        var ink='#103b42', soft='#f3fafb', line='#b6d9df';
+        var font='"Noto Sans Bengali","Hind Siliguri",system-ui,sans-serif';
+        function fontAt(size,weight){ctx.font=(weight||700)+' '+size+'px '+font;}
+        function text(value,x,y,maxWidth,size,color,weight,alignment){
+          ctx.fillStyle=color||ink;fontAt(size,weight);
+          ctx.textAlign=alignment||'left';
+          ctx.textBaseline='alphabetic';
+          ctx.fillText(String(value==null?'':value),x,y,maxWidth||800);
+          ctx.textAlign='left';
+        }
+        function splitLines(value,maxWidth,maxLines,size,weight){
+          var src=String(value==null?'':value).replace(/\r/g,'').trim()||'—';
+          fontAt(size,weight||700);
+          var lines=[],acc='';
+          src.split(/(\s+|\n)/).forEach(function(piece){
+            if(!piece)return;
+            if(piece.indexOf('\n')>=0){if(acc.trim())lines.push(acc.trim());acc='';return;}
+            if(ctx.measureText(acc+piece).width>maxWidth&&acc.trim()){lines.push(acc.trim());acc='';}
+            if(ctx.measureText(piece).width>maxWidth){
+              Array.from(piece).forEach(function(ch){
+                if(ctx.measureText(acc+ch).width>maxWidth&&acc.trim()){lines.push(acc.trim());acc='';}
+                acc+=ch;
+              });
+            }else acc+=piece;
+          });
+          if(acc.trim())lines.push(acc.trim());
+          if(!lines.length)lines.push('—');
+          if(lines.length>maxLines){
+            lines=lines.slice(0,maxLines);
+            var last=lines[maxLines-1];
+            while(last.length>1&&ctx.measureText(last+'…').width>maxWidth)last=Array.from(last).slice(0,-1).join('');
+            lines[maxLines-1]=last+'…';
           }
-          flush();
-          if(rows.length>maxLines){
-            rows=rows.slice(0,maxLines);
-            var tail=rows[rows.length-1];
-            while(tail.length>1 && ctx.measureText(tail+'…').width>maxWidth){tail=Array.from(tail).slice(0,-1).join('');}
-            rows[rows.length-1]=tail+'…';
-          }
-          return rows;
+          return lines;
         }
-        function drawLines(value, x, firstBaseline, width, maxLines, size, color, weight, lineHeight) {
-          var lines=breakLines(value,width,maxLines,size,weight);
-          ctx.textAlign='left';setFont(size,weight);ctx.fillStyle=color;
-          lines.forEach(function(l,i){ctx.fillText(l,x,firstBaseline+i*(lineHeight||size*1.3));});
+        function wrapped(value,x,y,width,limit,size,color,weight,leading){
+          var l=splitLines(value,width,limit,size,weight);
+          l.forEach(function(v,i){text(v,x,y+i*(leading||size*1.23),width,size,color,weight);});
         }
-        function panel(x,y,width,height){
-          ctx.fillStyle='#ffffff';ctx.beginPath();ctx.roundRect(x,y,width,height,20);ctx.fill();
-          ctx.lineWidth=1.5;ctx.strokeStyle='#d6e4e9';ctx.stroke();
+        function rounded(x,y,bw,bh,r,fill,stroke){
+          ctx.beginPath();ctx.roundRect(x,y,bw,bh,r);
+          if(fill){ctx.fillStyle=fill;ctx.fill();}
+          if(stroke){ctx.lineWidth=2;ctx.strokeStyle=stroke;ctx.stroke();}
         }
-        function label(v,x,y){drawLines(v,x,y,720,1,21,'#587186',800);}
-        function field(x,y,width,height,name,value,maxLines,size){
-          panel(x,y,width,height);label(name,x+24,y+32);
-          drawLines(value,x+24,y+78,width-48,maxLines||2,size||37,ink,800,(size||37)*1.23);
+        function field(x,y,bw,bh,label,value,size,limit){
+          rounded(x,y,bw,bh,14,'#ffffff',line);
+          text(label,x+21,y+28,bw-42,19,dark,850);
+          wrapped(value,x+21,y+74,bw-42,limit||2,size||34,ink,850,(size||34)*1.2);
         }
-        ctx.fillStyle=light;ctx.fillRect(0,0,w,h);
-        ctx.fillStyle='#0f172a';ctx.fillRect(0,0,w,313);
-        ctx.fillStyle=t.primary;ctx.fillRect(0,0,12,h);
-        ctx.fillStyle=t.primary;ctx.beginPath();ctx.roundRect(48,35,262,42,13);ctx.fill();
-        drawLines('OFFICIAL MONEY RECEIPT',63,63,245,1,20,'#ffffff',900);
-        drawLines(s.companyBn || DEFAULT_SETTINGS.companyBn,52,130,795,2,49,'#ffffff',900,56);
-        drawLines(s.companyEn || DEFAULT_SETTINGS.companyEn,52,237,800,1,25,'#c5f5f9',900);
-        drawLines([s.phone1,s.phone2].filter(Boolean).join('  •  '),52,276,795,1,21,'#e2f4f5',700);
-        if(s.bkashNumber){
-          ctx.fillStyle='#d50073';ctx.beginPath();ctx.roundRect(52,289,30,27,6);ctx.fill();
-          drawLines('৳',59,309,19,1,21,'#ffffff',900);
-          drawLines('bKash: '+String(s.bkashNumber),91,309,700,1,23,'#ffffff',900);
+        // Ticket paper, soft graph texture, teal edge and detachable ticket decoration.
+        ctx.fillStyle='#f9fdfe';ctx.fillRect(0,0,w,h);
+        ctx.strokeStyle='#e5f2f4';ctx.lineWidth=1;
+        for(var gx=33;gx<w;gx+=28){ctx.beginPath();ctx.moveTo(gx,94);ctx.lineTo(gx,h-65);ctx.stroke();}
+        for(var gy=110;gy<h-65;gy+=28){ctx.beginPath();ctx.moveTo(19,gy);ctx.lineTo(w,gy);ctx.stroke();}
+        ctx.fillStyle=teal;ctx.fillRect(0,0,18,h);
+        ctx.strokeStyle='#ffffff';ctx.lineWidth=3;
+        ctx.setLineDash([8,10]);ctx.beginPath();ctx.moveTo(11,120);ctx.lineTo(11,h-70);ctx.stroke();ctx.setLineDash([]);
+        // The travel voucher banner and agency identity are from the HTML preview design.
+        ctx.fillStyle=teal;ctx.fillRect(18,0,w-18,100);
+        text('✈   TOUR & TRAVEL BOOKING VOUCHER',54,44,770,21,'#ffffff',900);
+        text('OFFICIAL MONEY RECEIPT',54,76,720,25,'#ffffff',900);
+        text('BOOKING REF:  #'+(d.invoice||'—'),w-46,91,405,17,'#e0faff',750,'right');
+        rounded(45,118,810,244,16,'#ffffff',line);
+        rounded(68,142,64,64,15,teal);
+        text('✈',82,187,45,41,'#ffffff',900);
+        wrapped(s.companyBn||DEFAULT_SETTINGS.companyBn,152,181,672,2,43,dark,900,50);
+        text(s.companyEn||DEFAULT_SETTINGS.companyEn,155,231,652,23,teal,900);
+        text('☎',73,282,38,29,teal,900);
+        text('CONTACT / CALL:',126,281,212,21,dark,850);
+        text([s.phone1,s.phone2].filter(Boolean).join(' / '),341,281,476,23,ink,850);
+        if(String(s.bkashNumber||'').trim()){
+          rounded(73,298,36,34,7,'#d50073');
+          text('৳',81,322,20,26,'#ffffff',900);
+          text('bKash:',126,323,212,24,'#ba0067',900);
+          text(String(s.bkashNumber),341,323,475,24,'#ba0067',900);
         }
-        field(45,332,390,115,'ইনভয়েস / Invoice',d.invoice,1,36);
-        field(450,332,404,115,'তারিখ / Date',d.date,1,35);
-        field(45,463,810,122,'যাত্রী / Customer Name',d.customerName||'—',2,37);
-        field(45,599,810,147,'ট্যুর / Event',d.eventName||'—',2,39);
-        field(45,758,810,116,'মোবাইল / Contact',d.customerContact||'—',1,38);
-        field(45,886,810,118,'ঠিকানা / Pickup',d.customerAddress||'—',2,33);
-        field(45,1016,810,118,'যাত্রী ও সিট / Passenger • Seats',(d.paxOrQty||'—')+' জন • '+(d.seatNumbers||'সিট নির্ধারিত নয়'),2,32);
-        panel(45,1149,810,269);
-        drawLines('বুকিং হিসাব / PAYMENT SUMMARY',70,1193,740,1,25,t.secondary,900);
-        ctx.fillStyle='#e6f4f6';ctx.beginPath();ctx.roundRect(64,1214,772,91,14);ctx.fill();
-        drawLines('মোট বিল / TOTAL',85,1244,360,1,21,ink,800);
-        drawLines(currency(d.total),85,1290,660,1,42,ink,900);
-        ctx.fillStyle='#edf9f1';ctx.beginPath();ctx.roundRect(64,1320,367,79,12);ctx.fill();
-        ctx.fillStyle='#fff1f2';ctx.beginPath();ctx.roundRect(443,1320,393,79,12);ctx.fill();
-        drawLines('জমা / PAID',79,1347,325,1,19,'#066f46',900);
-        drawLines(currency(d.advance),79,1384,328,1,30,'#066f46',900);
-        drawLines('বকেয়া / DUE',458,1347,346,1,19,'#a61943',900);
-        drawLines(currency(d.due),458,1384,346,1,30,'#a61943',900);
-        panel(45,1434,810,115);
-        label('পেমেন্ট মাধ্যম / Paid via',69,1466);
-        drawLines(d.paymentMethod || 'Cash',69,1510,300,1,30,ink,900);
-        if (d.trxId) drawLines('TrxID: '+d.trxId,385,1507,437,1,24,ink,700);
-        if (Number(d.discount)>0) drawLines('ছাড়: '+currency(d.discount),385,1540,437,1,22,'#92400e',700);
-        panel(45,1566,810,210);
-        label('সেলসম্যান / Issued by',69,1604);
-        drawLines(d.salesman||'—',69,1643,405,1,31,ink,800);
-        label('রিসিপ্ট নিরাপত্তা কোড',69,1682);
-        drawLines(d.securityCode||'—',69,1720,570,1,24,t.secondary,900);
-        ctx.strokeStyle='#94a3b8';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(643,1715);ctx.lineTo(824,1715);ctx.stroke();
-        drawLines('Signature',664,1740,165,1,18,'#475569',700);
-        ctx.fillStyle=t.primary;ctx.fillRect(0,h-77,w,77);
-        drawLines(s.footerNotice||'Advance Money is not Refundable',58,h-31,780,1,24,'#ffffff',900);
-        ctx.strokeStyle=t.primary;ctx.lineWidth=3;ctx.strokeRect(2,2,w-4,h-4);
-        var finish=function(){callback(canvas,d);};
+        // Date, invoice and all customer information remain clearly readable on phone.
+        field(45,380,396,116,'ইনভয়েস / Invoice',d.invoice,32,1);
+        field(456,380,399,116,'তারিখ / Date',d.date,33,1);
+        field(45,511,810,112,'গ্রাহকের নাম / Customer Name',d.customerName||'—',35,1);
+        field(45,637,810,131,'ট্যুর / Event',d.eventName||'—',36,2);
+        field(45,782,810,110,'যোগাযোগ / Contact',d.customerContact||'—',34,1);
+        field(45,907,810,120,'ঠিকানা / Pickup',d.customerAddress||'—',31,2);
+        field(45,1042,810,112,'যাত্রী ও সিট / Passenger • Seats',
+          (d.paxOrQty||'—')+' জন  •  '+(d.seatNumbers||'সিট নির্ধারিত নয়'),30,1);
+
+        rounded(45,1170,810,255,17,'#ffffff',line);
+        text('বুকিংয়ের হিসাব / PAYMENT SUMMARY',68,1208,754,24,dark,900);
+        rounded(62,1226,776,81,12,'#e9f8fa');
+        text('মোট বিল / TOTAL',82,1259,390,21,dark,850);
+        text((formatCurrencyNumber(d.total,d.useBangla!==false))+' ৳',815,1287,380,39,ink,900,'right');
+        rounded(62,1320,369,86,12,'#edfdf4');
+        rounded(445,1320,393,86,12,'#fff1f2');
+        text('জমা / PAID',80,1349,312,20,'#047857',900);
+        text(formatCurrencyNumber(d.advance,d.useBangla!==false)+' ৳',81,1391,327,32,'#047857',900);
+        text('বকেয়া / DUE',465,1349,350,20,'#be123c',900);
+        text(formatCurrencyNumber(d.due,d.useBangla!==false)+' ৳',465,1391,350,32,'#be123c',900);
+        field(45,1441,810,108,'পেমেন্ট মাধ্যম / Paid via',
+          (d.paymentMethod||'Cash')+(d.trxId?'  •  TrxID: '+d.trxId:'')+
+          (Number(d.discount)>0?'  •  ছাড়: '+formatCurrencyNumber(d.discount,d.useBangla!==false)+' ৳':''),29,1);
+        rounded(45,1567,810,209,15,'#ffffff',line);
+        text('রিসিপ্ট প্রদানকারী / Issued by',68,1608,650,22,dark,900);
+        wrapped(d.salesman||'—',68,1655,490,1,31,ink,850);
+        text('নিরাপত্তা কোড / Security Code',68,1693,570,18,dark,800);
+        text(d.securityCode||'—',68,1726,585,23,teal,850);
+        ctx.strokeStyle='#a1bac4';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(638,1734);ctx.lineTo(816,1734);ctx.stroke();
+        text('Authorized Signature',650,1753,174,17,'#526b79',700);
         if(d.showStamp!==false){
-          ctx.save();ctx.translate(710,1606);ctx.rotate(-0.08);
+          ctx.save();ctx.translate(735,1597);ctx.rotate(-0.10);
           ctx.strokeStyle=d.due<=0?'#047857':'#be123c';ctx.lineWidth=3;
-          ctx.strokeRect(-115,-25,230,50);
-          drawLines(d.due<=0?'FULLY PAID':'DUE '+formatCurrencyNumber(d.due,false),-100,7,200,1,19,d.due<=0?'#047857':'#be123c',900);
+          ctx.strokeRect(-92,-25,184,44);
+          text(d.due<=0?'FULLY PAID':'DUE',-76,4,155,20,d.due<=0?'#047857':'#be123c',900);
           ctx.restore();
         }
-        if(hasSignatureStrokes && appState.signatureDataUrl){
+        ctx.fillStyle=teal;ctx.fillRect(18,h-72,w-18,72);
+        text(s.footerNotice||'Advance Money is not Refundable',53,h-28,785,23,'#ffffff',850);
+        var finish=function(){callback(canvas,d);};
+        if(appState.signatureDataUrl){
           var im=new Image();
-          im.onload=function(){try{ctx.drawImage(im,640,1640,185,72);}catch(e){}finish();};
+          im.onload=function(){try{ctx.drawImage(im,649,1645,164,76);}catch(e){}finish();};
           im.onerror=finish;
           im.src=appState.signatureDataUrl;
-        }else finish();
+        } else finish();
       }
+
       function shareCustomerReceiptImage(customReceiptData) {
         renderCustomerReceiptToCanvas(customReceiptData,function(canvas,d){
           try {
