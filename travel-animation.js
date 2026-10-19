@@ -19,7 +19,7 @@
         canvas.setAttribute('data-reduced-motion','true');
       }
 
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var dpr = Math.min(window.devicePixelRatio || 1, 1.4); // Mobile fullscreen animation, reduced GPU load
       var vw = window.innerWidth || 1200;
       var vh = window.innerHeight || 800;
 
@@ -49,9 +49,9 @@
       // =========================================================================
       function getPerimeterWaypoints() {
         var isMob = vw < 768;
-        var yBot = vh - (isMob ? 84 : 18);
-        var yTop = isMob ? 66 : 76;
-        var yMidLow = Math.round(vh * 0.68);
+        var yBot = vh - (isMob ? 152 : 18);
+        var yTop = isMob ? Math.max(190, Math.min(240, vh * 0.28)) : 76;
+        var yMidLow = Math.round(vh * 0.70);
         var yMidHigh = Math.round(vh * 0.36);
         var xLeftMargin = isMob ? 68 : 88;
         var xRightMargin = vw - (isMob ? 68 : 88);
@@ -93,7 +93,7 @@
         m.pants=randomOf(wardrobePants);
         m.hat=randomOf(wardrobeHats);
         m.bag=randomOf(wardrobeBags);
-        m.scale=randRange(0.48,0.67);
+        m.scale=randRange(0.75,0.92);
       }
       function adjustGroupSize() {
         var target=Math.floor(randRange(3,10));
@@ -132,7 +132,7 @@
       // =========================================================================
       function drawMiniAvatar(x, y, opts) {
         if (opts.inTent) return; // Hidden inside tent (tent renderer draws peeking head!)
-        var scale = opts.scale || 0.58;
+        var scale = opts.scale || (vw < 768 ? 0.83 : 0.58);
         var dir = opts.dir || 1;
         var phase = opts.phase || 0;
         var state = opts.state || 'walk';
@@ -1010,7 +1010,6 @@
         }
         var wheels=(kind==='rickshaw'?[-18,18]:kind==='cng'?[-19,19]:kind==='jeep'?[-26,26]:[-28,27]);
         wheels.forEach(function(px){ctx.fillStyle='#0f172a';ctx.beginPath();ctx.arc(px,-3.5,4.5,0,7);ctx.fill();ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.beginPath();ctx.arc(px,-3.5,2.2,0,7);ctx.stroke();});
-        if(boarded>0){ctx.fillStyle='#fef9c3';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(String(boarded)+' জন',0,-31);}
         ctx.restore();
       }
 
@@ -1242,7 +1241,7 @@
       function startBusPickupOnRoad() {
         var wps = getPerimeterWaypoints();
         var isMob = vw < 768;
-        var roadY = vh - (isMob ? 84 : 18);
+        var roadY = vh - (isMob ? 152 : 18);
         // Bus enters from left or right horizontal edge and drives to the group!
         var enterFromLeft = tour.groupX < vw * 0.65;
         tour.bus.active = true;
@@ -1282,7 +1281,7 @@
         // Ensures the user sees the bus smoothly driving along the road!
         // ---------------------------------------------------------------------
         var isMob = vw < 768;
-        var bottomRoadY = vh - (isMob ? 84 : 18);
+        var bottomRoadY = vh - (isMob ? 152 : 18);
         if (!tour.bus.active) {
           if (!tour.cruiserBus.active) {
             tour.cruiserBus.cooldown -= 1 / 30;
@@ -1612,13 +1611,6 @@
       }
 
       // Bangladesh tourist spots, rendered as tiny stylized vignettes that leave app controls clickable.
-      function drawDestinationLabel(x,y,alpha,label){
-        if(alpha<.04||!label)return;
-        ctx.save();ctx.globalAlpha=alpha*.87;ctx.font='700 11px "Hind Siliguri", sans-serif';ctx.textAlign='center';
-        var width=Math.min(174,Math.max(86,ctx.measureText(label).width+20));
-        ctx.fillStyle='rgba(15,23,42,.90)';ctx.beginPath();ctx.roundRect(x-width/2,y-111,width,21,8);ctx.fill();
-        ctx.fillStyle='#fff';ctx.fillText(label,x,y-96, width-10);ctx.restore();
-      }
       function drawTourTree(x,y,wave,color){
         ctx.save();ctx.translate(x,y);ctx.fillStyle='#78532e';ctx.fillRect(-3,-44,6,43);
         ctx.fillStyle=color||'#15803d';for(var i=0;i<4;i++){ctx.beginPath();ctx.ellipse(Math.sin(wave+i)*2+(i-1.5)*9,-43+(i%2)*9,14,17,0,0,Math.PI*2);ctx.fill();}ctx.restore();
@@ -1729,7 +1721,6 @@
         } else if (st === 'waterfall') {
           drawWaterfallLagoonSpot(sx, sy, al, tour.waveTick, tour.currentSpot.withCamp, tour.tentPeeker);
         }
-        drawDestinationLabel(sx,sy,al,tour.currentSpot.label);
       }
 
       function drawGroupSortedByDepth(applyMountainHeight) {
