@@ -9,7 +9,7 @@
   pointer-events: none !important;
   touch-action: none;
   z-index: 875;
-  opacity: .73;
+  opacity: var(--tour-animation-opacity,1);
   background: transparent;
   contain: strict;
 }
@@ -17,8 +17,11 @@
   #groupTravelStoryCanvas { display: block !important; }
   body:has(input:focus) #groupTravelStoryCanvas,
   body:has(textarea:focus) #groupTravelStoryCanvas,
-  body:has(select:focus) #groupTravelStoryCanvas { opacity: .43; }
+  body:has(select:focus) #groupTravelStoryCanvas { opacity: var(--tour-animation-opacity,1); }
 }
 @media screen and (min-width: 768px) { #groupTravelStoryCanvas { display:none !important; } }
 @media print { #groupTravelStoryCanvas { display:none !important; } }
-@media (prefers-reduced-motion: reduce) { #groupTravelStoryCanvas { opacity: .68; } }
+@media (prefers-reduced-motion: reduce) { #groupTravelStoryCanvas { opacity: var(--tour-animation-opacity,1); } }
+
+/* Accessibility: disabled by user, including on installed Android PWA. */
+html.tour-animation-off #groupTravelStoryCanvas {display:none!important}
