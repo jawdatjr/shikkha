@@ -5064,7 +5064,7 @@ Nearby Sadar Hospital Road.</textarea>
           document.getElementById('inpDiscountAmount').value = '0';
           document.getElementById('inpTrxId').value = '';
           updateLiveReceipt();
-          showToast('নতুন রিসিপ্ট ফর্ম প্রস্তুত (ইনভয়েস #' + (cur + 1) + ')', '➕');
+          showToast('নতুন রিসিপ্ট ফর্ম প্রস্তুত (ইনভয়েস #' + document.getElementById('inpInvoice').value + ')', '➕');
         });
 
         document.getElementById('btnMarkFullPaid').addEventListener('click', function () {
@@ -5679,6 +5679,6 @@ Nearby Sadar Hospital Road.</textarea>
   </script>
   <!-- Original HTML-inspired full-screen tour: no place names, no click interception. -->
   <canvas id="groupTravelStoryCanvas" class="no-print" aria-hidden="true"></canvas>
-  <script src="./travel-animation-pwa-v15.js" defer></script>
+  <script src="./travel-animation-pwa-v16.js" defer></script>
 </body>
 </html>
