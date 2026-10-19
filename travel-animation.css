@@ -1,20 +1,22 @@
-/* Shikkha travel-story art: deliberately independent of receipts, forms, and data storage. */
-#groupTravelStoryCanvas {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 845;
-  opacity: .77;
-  contain: strict;
+/* Shikkha mobile-only always-visible tourism strip, independent from POS/ledger logic. */
+#shikkhaTravelTourBar{display:none}
+#groupTravelStoryCanvas{display:block;width:100%;height:100%;pointer-events:none}
+@media screen and (max-width:767px){
+  #shikkhaTravelTourBar{display:block;position:fixed;left:9px;right:9px;bottom:calc(73px + env(safe-area-inset-bottom));height:112px;z-index:842;pointer-events:none;overflow:hidden;border-radius:15px;border:1px solid rgba(13,148,136,.45);box-shadow:0 6px 21px rgba(15,23,42,.18);background:linear-gradient(180deg,#b9ecfa,#d9f9e6 65%,#a4ce87)}
+  #groupTravelStoryCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:1;contain:layout paint}
+  #shikkhaTourTitle{position:absolute;top:6px;left:8px;max-width:calc(100% - 16px);padding:3px 9px;border-radius:999px;background:rgba(15,23,42,.86);color:#fff;font:800 11px/1.45 'Hind Siliguri','Noto Sans Bengali',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 6px #0f172a2b}
+  body{padding-bottom:calc(214px + env(safe-area-inset-bottom))!important}
+  body:has(input:focus),body:has(textarea:focus),body:has(select:focus){padding-bottom:calc(170px + env(safe-area-inset-bottom))!important}
+  body:has(input:focus) #shikkhaTravelTourBar,body:has(textarea:focus) #shikkhaTravelTourBar,body:has(select:focus) #shikkhaTravelTourBar{height:57px;opacity:.85}
+  #viewTabCreate .mobile-create-actions{bottom:calc(196px + env(safe-area-inset-bottom))}
+  .mobile-more-menu{bottom:calc(194px + env(safe-area-inset-bottom))}
+  .toast-box{bottom:calc(245px + env(safe-area-inset-bottom))}
+  #mobileMoreMenu{bottom:calc(194px + env(safe-area-inset-bottom))}
+  @media (max-height:570px){
+    #shikkhaTravelTourBar{height:77px;bottom:calc(67px + env(safe-area-inset-bottom))}
+    #viewTabCreate .mobile-create-actions{bottom:calc(153px + env(safe-area-inset-bottom))}
+    .mobile-more-menu,#mobileMoreMenu{bottom:calc(153px + env(safe-area-inset-bottom))}
+  }
 }
-@media (max-width: 767px) {
-  #groupTravelStoryCanvas { opacity: .50; }
-  /* Keep text fields easy to read when the phone's keyboard is open. */
-  body:has(input:focus) #groupTravelStoryCanvas,
-  body:has(textarea:focus) #groupTravelStoryCanvas,
-  body:has(select:focus) #groupTravelStoryCanvas { opacity: .13; }
-}
-@media print { #groupTravelStoryCanvas { display: none !important; } }
-@media (prefers-reduced-motion: reduce) { #groupTravelStoryCanvas { opacity: .30; } }
+@media screen and (min-width:768px){#shikkhaTravelTourBar{display:none!important}}
+@media print{#shikkhaTravelTourBar{display:none!important}}
