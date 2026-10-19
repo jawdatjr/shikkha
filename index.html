@@ -1193,8 +1193,22 @@
     }
     .receipt-preview-wrapper {overflow:visible !important;padding:7px !important;background:#edf6f7 !important}
     @media screen and (max-width:767px){
-      #unifiedReceiptPreviewImage {max-width:100%;border-radius:7px}
-      .receipt-preview-wrapper {padding:4px !important}
+      #unifiedReceiptPreviewImage {
+        width:calc(100% - 8px) !important;
+        max-width:345px !important;
+        height:auto !important;
+        margin:0 auto !important;
+        border-radius:7px;
+        object-fit:contain;
+        display:block;
+      }
+      .receipt-preview-wrapper {
+        box-sizing:border-box;
+        width:100%;
+        max-width:100%;
+        overflow:hidden !important;
+        padding:4px !important;
+      }
     }
     @media print{
       #viewTabCreate > .receipt-preview-section {display:block !important}
@@ -3675,7 +3689,8 @@ Nearby Sadar Hospital Road.</textarea>
         var jpegLen = jpegBin.length;
         var imgW = canvas.width;
         var imgH = canvas.height;
-        var pdfW = imgH > imgW ? 450 : 620;
+        // The compact landscape travel ticket is sized like a handheld receipt, not a desktop page.
+        var pdfW = (imgW===1671 && imgH===1296) ? 430 : (imgH > imgW ? 450 : 620);
         var pdfH = Math.round(pdfW * imgH / imgW);
 
         var parts = [];
