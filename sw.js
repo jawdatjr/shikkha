@@ -1,6 +1,6 @@
 // Shikkha offline PWA. Network-first HTML prevents obsolete cached app shells.
-const CACHE_VERSION='ashik-shikkha-salesman-compact-mobile-v21-2026-10-20';
-const ASSETS=['./','./index.html','./manifest.webmanifest','./tailwind-offline.css','./qr-generator-offline.js','./receipt-ticket-landscape-v21.js','./travel-animation.css','./travel-animation-pwa-v17.js','./icon-192.png','./icon-512.png'];
+const CACHE_VERSION='ashik-shikkha-salesman-compact-mobile-v22-2026-10-20';
+const ASSETS=['./','./index.html','./manifest.webmanifest','./tailwind-offline.css','./qr-generator-offline.js','./receipt-ticket-landscape-v22.js','./travel-animation.css','./travel-animation-pwa-v17.js','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE_VERSION).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));
 });
