@@ -1,0 +1,20 @@
+/* Shikkha travel-story art: deliberately independent of receipts, forms, and data storage. */
+#groupTravelStoryCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 845;
+  opacity: .77;
+  contain: strict;
+}
+@media (max-width: 767px) {
+  #groupTravelStoryCanvas { opacity: .50; }
+  /* Keep text fields easy to read when the phone's keyboard is open. */
+  body:has(input:focus) #groupTravelStoryCanvas,
+  body:has(textarea:focus) #groupTravelStoryCanvas,
+  body:has(select:focus) #groupTravelStoryCanvas { opacity: .13; }
+}
+@media print { #groupTravelStoryCanvas { display: none !important; } }
+@media (prefers-reduced-motion: reduce) { #groupTravelStoryCanvas { opacity: .30; } }
