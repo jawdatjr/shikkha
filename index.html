@@ -2952,6 +2952,90 @@ Nearby Sadar Hospital Road.</textarea>
         }
       }
 
+      function normalizedSalesmen() {
+        var a=appState.settings.salesmen;
+        if(!Array.isArray(a)||!a.length) a=['কাউন্টার ১'];
+        var unique=[];
+        a.forEach(function(v){
+          var name=String(v||'').trim().slice(0,80);
+          if(name&&!unique.includes(name))unique.push(name);
+        });
+        return unique.length?unique:['কাউন্টার ১'];
+      }
+      function setSalesmanSelection(name) {
+        var sel=document.getElementById('inpSalesmanName');
+        if(!sel)return;
+        var selected=String(name||'').trim()||normalizedSalesmen()[0];
+        if(!Array.from(sel.options).some(function(o){return o.value===selected;})){
+          var tmp=document.createElement('option');
+          tmp.value=selected;tmp.textContent=selected+' (পুরোনো রিসিপ্ট)';
+          tmp.dataset.legacy='true';sel.appendChild(tmp);
+        }
+        sel.value=selected;
+      }
+      function renderSalesmanManager(preserveCurrent) {
+        var names=normalizedSalesmen();
+        appState.settings.salesmen=names;
+        var sel=document.getElementById('inpSalesmanName');
+        var old=preserveCurrent && sel ? sel.value : names[0];
+        if(sel){
+          sel.textContent='';
+          names.forEach(function(name){
+            var o=document.createElement('option');o.value=name;o.textContent=name;sel.appendChild(o);
+          });
+          setSalesmanSelection(old);
+        }
+        var list=document.getElementById('settingsSalesmanList');
+        if(!list)return;
+        list.textContent='';
+        names.forEach(function(name,idx){
+          var row=document.createElement('div');row.className='settings-manager-row';
+          var label=document.createElement('span');label.textContent=(idx+1)+'. '+name+(idx===0?'  ✓ ডিফল্ট':'');
+          label.style.flex='1';row.appendChild(label);
+          function action(symbol,title,onClick,danger){
+            var b=document.createElement('button');b.type='button';b.className='mini-action'+(danger?' danger':'');
+            b.textContent=symbol;b.title=title;b.setAttribute('aria-label',title);
+            b.addEventListener('click',onClick);row.appendChild(b);
+          }
+          if(idx>0)action('↑','উপরে নিয়ে যান',function(){changeSalesmanList(function(a){var x=a[idx-1];a[idx-1]=a[idx];a[idx]=x;return a;});});
+          if(idx<names.length-1)action('↓','নিচে নিয়ে যান',function(){changeSalesmanList(function(a){var x=a[idx+1];a[idx+1]=a[idx];a[idx]=x;return a;});});
+          if(names.length>1)action('✕','সেলসম্যান মুছুন',function(){
+            if(!confirm(name+'— এই সেলসম্যান তালিকা থেকে সরাবেন? পুরোনো রিসিপ্টের নাম অপরিবর্তিত থাকবে।'))return;
+            changeSalesmanList(function(a){a.splice(idx,1);return a;});
+          },true);
+          list.appendChild(row);
+        });
+      }
+      function changeSalesmanList(mutate) {
+        var previous=normalizedSalesmen(),next=mutate(previous.slice());
+        if(!next.length)next=['কাউন্টার ১'];
+        var settings=Object.assign({},appState.settings,{salesmen:next});
+        if(!safeSetStorage(STORAGE_SETTINGS_KEY,JSON.stringify(settings))){
+          showToast('সেলসম্যান তালিকা সেভ হয়নি','⚠️');return false;
+        }
+        appState.settings=settings;
+        renderSalesmanManager(false);
+        updateLiveReceipt();
+        showToast('সেলসম্যান তালিকা সেভ হয়েছে','✅');
+        return true;
+      }
+      function initializeSalesmanControls() {
+        renderSalesmanManager(false);
+        document.getElementById('btnAddSalesman').addEventListener('click',function(){
+          var inp=document.getElementById('inpAddSalesman'),name=inp.value.trim();
+          if(!name){showToast('সেলসম্যানের নাম লিখুন','⚠️');return;}
+          if(normalizedSalesmen().includes(name)){showToast('এই নামটি তালিকায় আছে','⚠️');return;}
+          if(changeSalesmanList(function(a){a.push(name);return a;}))inp.value='';
+        });
+        document.getElementById('inpAddSalesman').addEventListener('keydown',function(e){
+          if(e.key==='Enter'){e.preventDefault();document.getElementById('btnAddSalesman').click();}
+        });
+        document.getElementById('inpSalesmanName').addEventListener('change',updateLiveReceipt);
+      }
+      function setDefaultEventForNewReceipt() {
+        var input=document.getElementById('inpEventName');
+        if(input && appState.presets.length && appState.presets[0].eventName) input.value=appState.presets[0].eventName;
+      }
       // --- TOUR PACKAGE PRESETS ---
       function loadPresetsFromStorage() {
         var raw = safeGetStorage(STORAGE_PRESETS_KEY);
@@ -2966,6 +3050,7 @@ Nearby Sadar Hospital Road.</textarea>
           }
         }
         renderPresetBars();
+        if(!document.getElementById('inpEventName').value.trim())setDefaultEventForNewReceipt();
       }
 
       function savePresetsToStorage() {
@@ -3023,7 +3108,28 @@ Nearby Sadar Hospital Road.</textarea>
       // --- THEME & LAYOUT RENDERING ---
       function renderThemeButtons() {
         var container = document.getElementById('quickThemeContainer');
+        var circles = document.getElementById('previewThemeCircles');
         container.innerHTML = '';
+        if(circles){
+          circles.querySelectorAll('button').forEach(function(b){b.remove();});
+          RECEIPT_THEMES.forEach(function(theme){
+            var b=document.createElement('button');b.type='button';
+            b.style.backgroundColor=theme.primary;
+            b.className=appState.settings.themeId===theme.id?'active':'';
+            b.title=theme.name;b.setAttribute('aria-label',theme.name);
+            b.setAttribute('aria-pressed',String(appState.settings.themeId===theme.id));
+            b.addEventListener('click',function(){
+              var previous=appState.settings.themeId;
+              appState.settings.themeId=theme.id;
+              if(!saveSettingsToStorage()){
+                appState.settings.themeId=previous;
+                showToast('থিম সেভ হয়নি','⚠️');return;
+              }
+              applyThemeToReceipt();renderThemeButtons();updateLiveReceipt();
+            });
+            circles.appendChild(b);
+          });
+        }
         RECEIPT_THEMES.forEach(function (t) {
           var btn = document.createElement('button');
           btn.type = 'button';
@@ -3032,8 +3138,12 @@ Nearby Sadar Hospital Road.</textarea>
             '<span style="width:14px;height:14px;border-radius:4px;background:' + t.primary + ';display:inline-block;flex-shrink:0;"></span>' +
             '<span class="truncate">' + t.name + '</span>';
           btn.addEventListener('click', function () {
+            var previous=appState.settings.themeId;
             appState.settings.themeId = t.id;
-            saveSettingsToStorage();
+            if(!saveSettingsToStorage()){
+              appState.settings.themeId=previous;
+              showToast('থিম সেভ হয়নি','⚠️');return;
+            }
             applyThemeToReceipt();
             renderThemeButtons();
             updateLiveReceipt();
@@ -4600,7 +4710,7 @@ Nearby Sadar Hospital Road.</textarea>
 
         document.getElementById('inpInvoice').value = found.invoice || '';
         document.getElementById('inpDate').value = found.date || '';
-        document.getElementById('inpSalesmanName').value = found.salesman || 'কাউন্টার ১';
+        setSalesmanSelection(found.salesman || normalizedSalesmen()[0]);
         document.getElementById('inpCustomerName').value = found.customerName || '';
         document.getElementById('inpPaxOrQty').value = found.paxOrQty || '';
         document.getElementById('inpCustomerAddress').value = found.customerAddress || '';
@@ -4941,6 +5051,8 @@ Nearby Sadar Hospital Road.</textarea>
         });
 
         document.getElementById('btnNewReceipt').addEventListener('click', function () {
+          setSalesmanSelection(normalizedSalesmen()[0]);
+          setDefaultEventForNewReceipt();
           document.getElementById('inpInvoice').value = syncMakeInvoice();
           document.getElementById('inpCustomerName').value = '';
           document.getElementById('inpPaxOrQty').value = '১';
@@ -5474,6 +5586,12 @@ Nearby Sadar Hospital Road.</textarea>
       // After online installation, SW serves the PWA shell from cache while offline.
       // Move only existing UI nodes. Preserve their original IDs, listeners, receipt/verify/storage code.
       function setupMobileSettingsPanels() {
+        var priority=document.getElementById('settingsPriorityPackages');
+        var presets=document.getElementById('settingsPresetList');
+        if(priority&&presets){
+          var card=presets.closest('.panel-card');
+          if(card)priority.appendChild(card);
+        }
         var mount = document.getElementById('settingsSignatureMount');
         var signatureCanvas = document.getElementById('signaturePadCanvas');
         var clearButton = document.getElementById('btnClearSignature');
@@ -5547,6 +5665,7 @@ Nearby Sadar Hospital Road.</textarea>
         updateNetworkStatusBadge();
         registerOfflineSupport();
         loadSettingsFromStorage();
+        initializeSalesmanControls();
         loadPresetsFromStorage();
         setupMobileSettingsPanels();
         initSignaturePad();
