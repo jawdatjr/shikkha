@@ -1153,6 +1153,22 @@
         min-height: 112px;
       }
     }
+    /* Mobile-only Settings menu, bKash and isolated feature drawers. */
+    .bkash-mini-icon {display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;margin-right:5px;border-radius:6px;background:#d41470;color:#fff;font-size:17px;font-weight:900;vertical-align:middle}
+    .settings-feature {margin:13px 0;padding:0 12px;border:1px solid #cbd5e1;border-radius:13px;background:#f8fafc}
+    .settings-feature > summary {padding:13px 2px;min-height:44px;display:flex;align-items:center;font-size:13px;font-weight:850;cursor:pointer;color:#0f4353}
+    .settings-feature-content {padding:0 2px 13px}
+    .settings-action-button {display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 14px;min-height:47px;border:1px solid #cbd5e1;border-radius:12px;background:#ecf8fc;color:#0f4353;font:800 14px/1.4 inherit;margin:12px 0;cursor:pointer}
+    #settingsVerifyMount #viewTabVerify {margin-top:8px}
+    #settingsVerifyMount #panelVerify {padding:12px;box-shadow:none;border:1px solid #d3e3e9}
+    #settingsSignatureMount #signaturePadCanvas {width:100%;touch-action:none}
+    #settingsBackupDetails > section {border:0;box-shadow:none;padding:7px 0 14px;background:transparent}
+    #mobileMoreMenu {display:none!important}
+    @media screen and (max-width:767px) {
+      .mobile-bottom-nav #mobNavMore {display:flex}
+      #mobNavVerify,#mobNavSettings,#tabBtnVerify {display:none!important}
+      #viewTabSettings #settingsSignatureMount .form-input{font-size:16px}
+    }
   </style>
   <link rel="stylesheet" href="./travel-animation.css" />
 </head>
@@ -2145,6 +2161,15 @@
             </div>
           </div>
 
+          <div class="form-group" id="bkashSettingsCard">
+            <label class="form-label" for="inpBkashNumber">
+              <span class="bkash-mini-icon" aria-hidden="true">৳</span>
+              <strong style="color:#b4005e;">bKash</strong> নম্বর (বিকাশ নম্বর)
+            </label>
+            <input type="tel" inputmode="numeric" autocomplete="off" id="inpBkashNumber" class="form-input" placeholder="01XXXXXXXXX" maxlength="18" />
+            <p class="text-xs text-slate-500 mt-1">একবার সেভ করলে এই ফোনে থাকবে। প্রয়োজন হলে Settings থেকে বদলান।</p>
+          </div>
+
           <div class="form-group">
             <label class="form-label" for="inpCompanyAddress">অফিসের ঠিকানা (Office Address)</label>
             <textarea id="inpCompanyAddress" rows="2" class="form-textarea">Kumarshil mur (Kismat Medical)
@@ -2190,6 +2215,16 @@ Nearby Sadar Hospital Road.</textarea>
               </button>
             </div>
           </div>
+
+          <details id="settingsSignatureDetails" class="settings-feature">
+            <summary>✍️ Signature — আপলোড, আঁকা বা পরিবর্তন করুন</summary>
+            <div id="settingsSignatureMount" class="settings-feature-content">
+              <p class="text-xs text-slate-600">একবার স্বাক্ষর দিলে পরের সব রিসিপ্টে থাকবে। বদলাতে চাইলে এখানে আবার আপলোড/আঁকুন।</p>
+            </div>
+          </details>
+
+          <button type="button" id="btnOpenVerifySettings" class="settings-action-button" aria-expanded="false">🛡️ রিসিপ্ট যাচাই <span>›</span></button>
+          <div id="settingsVerifyMount"></div>
 
           <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
             <span class="text-xs text-slate-500">সব পরিবর্তন অফলাইনে ব্রাউজারে সেভ থাকে</span>
@@ -2355,7 +2390,7 @@ Nearby Sadar Hospital Road.</textarea>
       <span>সেটিংস</span>
     </button>
     <button type="button" class="mob-nav-btn" id="mobNavMore" aria-controls="mobileMoreMenu" aria-expanded="false">
-      <span class="text-base">☰</span><span>আরও</span>
+      <span class="text-base">⚙️</span><span>সেটিংস</span>
     </button>
   </nav>
   <div id="mobileMoreMenu" class="mobile-more-menu no-print" hidden>
@@ -2469,7 +2504,8 @@ Nearby Sadar Hospital Road.</textarea>
         footerNotice: 'Advance Money is not Refundable',
         themeId: 'teal-classic',
         layoutMode: 'clean',
-        logoDataUrl: ''
+        logoDataUrl: '',
+        bkashNumber: ''
       };
 
       // --- BILINGUAL DICTIONARY (Bangla & English) ---
@@ -3768,6 +3804,7 @@ Nearby Sadar Hospital Road.</textarea>
         document.getElementById('inpCompanyEn').value = s.companyEn || '';
         document.getElementById('inpPhone1').value = s.phone1 || '';
         document.getElementById('inpPhone2').value = s.phone2 || '';
+        document.getElementById('inpBkashNumber').value = s.bkashNumber || '';
         document.getElementById('inpCompanyAddress').value = s.address || '';
         document.getElementById('inpReceiptBadge').value = s.receiptBadge || '';
         document.getElementById('inpEventFieldLabel').value = s.eventFieldLabel || '';
@@ -3777,22 +3814,31 @@ Nearby Sadar Hospital Road.</textarea>
       }
 
       function readInputsToSettings() {
-        appState.settings.companyBn = document.getElementById('inpCompanyBn').value;
-        appState.settings.companyEn = document.getElementById('inpCompanyEn').value;
-        appState.settings.phone1 = document.getElementById('inpPhone1').value;
-        appState.settings.phone2 = document.getElementById('inpPhone2').value;
-        appState.settings.address = document.getElementById('inpCompanyAddress').value;
-        appState.settings.receiptBadge = document.getElementById('inpReceiptBadge').value;
-        appState.settings.eventFieldLabel = document.getElementById('inpEventFieldLabel').value;
-        appState.settings.signatoryLabel = document.getElementById('inpSignatoryLabel').value;
-        appState.settings.secretKey = document.getElementById('inpSecretKey').value;
-        appState.settings.footerNotice = document.getElementById('inpFooterNotice').value;
-        saveSettingsToStorage();
+        // Transactional save: never claim success or discard previously saved settings on storage failure.
+        var updated = Object.assign({}, appState.settings, {
+          companyBn: document.getElementById('inpCompanyBn').value,
+          companyEn: document.getElementById('inpCompanyEn').value,
+          phone1: document.getElementById('inpPhone1').value,
+          phone2: document.getElementById('inpPhone2').value,
+          bkashNumber: document.getElementById('inpBkashNumber').value.trim(),
+          address: document.getElementById('inpCompanyAddress').value,
+          receiptBadge: document.getElementById('inpReceiptBadge').value,
+          eventFieldLabel: document.getElementById('inpEventFieldLabel').value,
+          signatoryLabel: document.getElementById('inpSignatoryLabel').value,
+          secretKey: document.getElementById('inpSecretKey').value,
+          footerNotice: document.getElementById('inpFooterNotice').value
+        });
+        if (!safeSetStorage(STORAGE_SETTINGS_KEY, JSON.stringify(updated))) {
+          showToast('ফোনে জায়গা নেই/স্টোরেজ বন্ধ: সেটিংস সেভ হয়নি। আগের সেভ করা সেটিংস অক্ষত আছে।', '⚠️');
+          return false;
+        }
+        appState.settings = updated;
         updateLiveReceipt();
+        return true;
       }
 
       function saveSettingsToStorage() {
-        safeSetStorage(STORAGE_SETTINGS_KEY, JSON.stringify(appState.settings));
+        return safeSetStorage(STORAGE_SETTINGS_KEY, JSON.stringify(appState.settings));
       }
 
       // --- EXPENSES STORAGE & MANAGEMENT (খরচের হিসাব) ---
@@ -4678,9 +4724,8 @@ Nearby Sadar Hospital Road.</textarea>
           moreBtn.setAttribute('aria-expanded', 'false');
         }
         moreBtn.addEventListener('click', function () {
-          var next = moreMenu.hidden;
-          moreMenu.hidden = !next;
-          moreBtn.setAttribute('aria-expanded', String(next));
+          closeMobileMore();
+          switchTab('settings');
         });
         document.querySelectorAll('[data-more-route]').forEach(function (button) {
           button.addEventListener('click', function () {
@@ -4917,8 +4962,14 @@ Nearby Sadar Hospital Road.</textarea>
         });
 
         document.getElementById('btnResetSettings').addEventListener('click', function () {
+          if (!confirm('সমস্ত কোম্পানি সেটিংস ডিফল্টে ফিরিয়ে দেবেন? আগে সেভ করা নাম/বিকাশ নম্বর বদলে যাবে।')) return;
+          var prevSettings = appState.settings;
           appState.settings = cloneObj(DEFAULT_SETTINGS);
-          saveSettingsToStorage();
+          if (!saveSettingsToStorage()) {
+            appState.settings = prevSettings;
+            showToast('রিসেট সেভ হয়নি, আগের সেটিংস অক্ষত আছে', '⚠️');
+            return;
+          }
           syncSettingsToInputs();
           applyThemeToReceipt();
           applyLayoutMode('clean');
@@ -4929,9 +4980,9 @@ Nearby Sadar Hospital Road.</textarea>
         });
 
         document.getElementById('btnSaveSettingsDone').addEventListener('click', function () {
-          readInputsToSettings();
+          if (!readInputsToSettings()) return;
           switchTab('create');
-          showToast('এজেন্সি সেটিংস সেভ করা হয়েছে!', '⚙️');
+          showToast('সেটিংস সেভ হয়েছে এবং পরেও থাকবে (এই ফোনে)', '✅');
         });
 
         document.getElementById('btnAddPresetPackage').addEventListener('click', function () {
@@ -5352,10 +5403,54 @@ Nearby Sadar Hospital Road.</textarea>
       }
 
       // After online installation, SW serves the PWA shell from cache while offline.
+      // Move only existing UI nodes. Preserve their original IDs, listeners, receipt/verify/storage code.
+      function setupMobileSettingsPanels() {
+        var mount = document.getElementById('settingsSignatureMount');
+        var signatureCanvas = document.getElementById('signaturePadCanvas');
+        var clearButton = document.getElementById('btnClearSignature');
+        var signatureUpload = document.getElementById('inpSignatureUpload');
+        if (mount && signatureCanvas && clearButton && signatureUpload) {
+          mount.appendChild(clearButton.parentElement);
+          mount.appendChild(signatureCanvas.parentElement);
+          mount.appendChild(signatureUpload.parentElement);
+        }
+
+        var v = document.getElementById('viewTabVerify');
+        var verifyMount = document.getElementById('settingsVerifyMount');
+        var verifyButton = document.getElementById('btnOpenVerifySettings');
+        if (verifyMount && v && verifyButton) {
+          verifyMount.appendChild(v);
+          verifyButton.addEventListener('click', function () {
+            var opening = v.classList.contains('hidden');
+            v.classList.toggle('hidden', !opening);
+            verifyButton.setAttribute('aria-expanded', String(opening));
+            if (opening) v.scrollIntoView({behavior:'smooth',block:'start'});
+          });
+        }
+        var backup = document.querySelector('section[aria-labelledby="cloudSyncTitle"]');
+        if (backup && backup.parentNode && !document.getElementById('settingsBackupDetails')) {
+          var drawer = document.createElement('details');
+          drawer.id = 'settingsBackupDetails';
+          drawer.className = 'settings-feature';
+          var summary = document.createElement('summary');
+          summary.textContent = '☁️ Backup — Auto GitHub Backup সেটিংস';
+          drawer.appendChild(summary);
+          backup.parentNode.insertBefore(drawer,backup);
+          drawer.appendChild(backup);
+        }
+      }
+
       function registerOfflineSupport() {
         if ('serviceWorker' in navigator && (window.isSecureContext || location.hostname === 'localhost')) {
           window.addEventListener('load', function () {
-            navigator.serviceWorker.register('./sw.js').catch(function (err) {
+            navigator.serviceWorker.register('./sw.js', {updateViaCache:'none'}).then(function (registration) {
+              // Installed PWA instances stay alive for days. Refresh their SW registration whenever online.
+              registration.update().catch(function(){});
+              window.addEventListener('online',function(){registration.update().catch(function(){});});
+              document.addEventListener('visibilitychange',function(){
+                if (!document.hidden && navigator.onLine !== false) registration.update().catch(function(){});
+              });
+            }).catch(function (err) {
               console.warn('Offline installation unavailable:', err);
             });
           });
@@ -5383,6 +5478,7 @@ Nearby Sadar Hospital Road.</textarea>
         registerOfflineSupport();
         loadSettingsFromStorage();
         loadPresetsFromStorage();
+        setupMobileSettingsPanels();
         initSignaturePad();
         bindEvents();
         updateLiveReceipt();
@@ -5394,6 +5490,6 @@ Nearby Sadar Hospital Road.</textarea>
   </script>
   <!-- Original HTML-inspired full-screen tour: no place names, no click interception. -->
   <canvas id="groupTravelStoryCanvas" class="no-print" aria-hidden="true"></canvas>
-  <script src="./travel-animation.js" defer></script>
+  <script src="./travel-animation-pwa-v14.js" defer></script>
 </body>
 </html>
