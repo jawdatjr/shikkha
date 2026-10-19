@@ -3,7 +3,7 @@
       if (!canvas) return;
       var ctx = canvas.getContext('2d');
       if (!ctx) return;
-      var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var reduceMotion = false; // Always play the explicitly requested tour; respect app-only pause if added later.
       var lastRenderTime = 0;
       function scheduleFrame() {
         window.requestAnimationFrame(function(now) {
@@ -93,10 +93,10 @@
         m.pants=randomOf(wardrobePants);
         m.hat=randomOf(wardrobeHats);
         m.bag=randomOf(wardrobeBags);
-        m.scale=randRange(0.75,0.92);
+        m.scale=randRange(0.92,1.11);
       }
       function adjustGroupSize() {
-        var target=Math.floor(randRange(3,10));
+        var target=Math.floor(randRange(5,10)); // 5-9 distinct visible travelers
         // Natural arrivals / departures between activities, never during a boarding sequence.
         while(groupMembers.length>target)groupMembers.pop();
         while(groupMembers.length<target) {
@@ -132,7 +132,7 @@
       // =========================================================================
       function drawMiniAvatar(x, y, opts) {
         if (opts.inTent) return; // Hidden inside tent (tent renderer draws peeking head!)
-        var scale = opts.scale || (vw < 768 ? 0.83 : 0.58);
+        var scale = opts.scale || (vw < 768 ? 1.04 : 0.58);
         var dir = opts.dir || 1;
         var phase = opts.phase || 0;
         var state = opts.state || 'walk';
@@ -1019,12 +1019,12 @@
       // roaming at each spot, and real horizontal bus driving!
       // =========================================================================
       var SPOT_POOL = [
-        { type: 'sundarbans', withCamp:false, duration:12.0, label:'সুন্দরবন • বাঘ ও হরিণ' },
+        { type: 'sundarbans', withCamp:false, duration:9.0, label:'সুন্দরবন • বাঘ ও হরিণ' },
         { type: 'national_zoo',withCamp:false,duration:11.5,label:'জাতীয় চিড়িয়াখানা • মিরপুর' },
-        { type: 'bandarban', withCamp:true,duration:12.0,label:'বান্দরবান • নীলগিরি' },
+        { type: 'bandarban', withCamp:true,duration:9.0,label:'বান্দরবান • নীলগিরি' },
         { type: 'sajek', withCamp:true,duration:11.0,label:'সাজেক ভ্যালি' },
-        { type: 'ratargul', withCamp:false,duration:12.0,label:'রাতারগুল • সিলেট' },
-        { type: 'saint_martin', withCamp:false,duration:12.0,label:'সেন্ট মার্টিন দ্বীপ' },
+        { type: 'ratargul', withCamp:false,duration:9.0,label:'রাতারগুল • সিলেট' },
+        { type: 'saint_martin', withCamp:false,duration:9.0,label:'সেন্ট মার্টিন দ্বীপ' },
         { type: 'srimangal', withCamp:false,duration:11.0,label:'শ্রীমঙ্গল • চা বাগান' },
         { type: 'mountain',   withCamp: false, duration: 10.5, label:'পার্বত্য দৃশ্য' },
         { type: 'tent_camp',  withCamp: true,  duration: 11.0 },
@@ -1171,9 +1171,9 @@
             }
           } else if (stype === 'tea_garden') {
             // Spread out in 2D across the tea garden hills (never in a line!)
-            var spreadX = [-52, -24, 4, 28, 50];
-            m.tx = tour.spotX + spreadX[i] + randRange(-8, 8);
-            m.ty = tour.spotY + randRange(-8, 5);
+            var spreadX = (i - (groupMembers.length - 1) / 2) * 20;
+            m.tx = tour.spotX + spreadX + randRange(-5, 5);
+            m.ty = tour.spotY + randRange(-13, 9);
             if (i === 0) {
               m.targetState = 'take_photo';
             } else if (i === 1 || i === 2) {
@@ -1183,9 +1183,9 @@
             }
           } else if (stype === 'coxs_bazar' || stype === 'waterfall' || stype === 'saint_martin' || stype === 'ratargul' || stype === 'sundarbans' || stype === 'national_zoo' || stype === 'bandarban' || stype === 'sajek' || stype === 'srimangal') {
             // Spread out across the beach / waterfall lagoon
-            var bSpread = [-54, -22, 6, 30, 52];
-            m.tx = tour.spotX + bSpread[i] + randRange(-9, 9);
-            m.ty = tour.spotY + randRange(-4, 6);
+            var bSpread = (i - (groupMembers.length - 1) / 2) * 21;
+            m.tx = tour.spotX + bSpread + randRange(-5, 5);
+            m.ty = tour.spotY + randRange(-13, 10);
             if (i === 0) {
               // Relaxes under beach umbrella / rock bench
               m.tx = tour.spotX + 36;
@@ -1225,7 +1225,7 @@
         var wps = getPerimeterWaypoints();
         tour.wpIndex = (tour.wpIndex + 1) % wps.length;
         var targetWp = wps[tour.wpIndex];
-        tour.spotX = clamp(targetWp.x + randRange(-25, 25), 88, vw - 88);
+        tour.spotX = clamp(targetWp.x + randRange(-18, 18), 100, vw - 100);
         tour.spotY = targetWp.y;
         tour.currentSpot = pickNextSpotConfig();
         tour.spotAlpha = 0;
@@ -1322,7 +1322,7 @@
           drawActiveSpotScene();
 
           if (dist > 8) {
-            var step = 0.95;
+            var step = 1.58;
             // Gentle winding curve when moving vertically along the left/right sides
             var perpWave = Math.abs(dy) > Math.abs(dx) ? Math.sin(tour.waveTick * 0.7) * 0.45 : 0;
             tour.groupX += (dx / dist) * step + perpWave;
@@ -1392,7 +1392,7 @@
 
             if (tdist > 2.2) {
               gm.inTent = false;
-              var walkSpd = 0.78 * gm.speedMul;
+              var walkSpd = 1.12 * gm.speedMul;
               gm.x += (tdx / tdist) * walkSpd;
               gm.y += (tdy / tdist) * walkSpd;
               gm.dir = tdx >= 0 ? 1 : -1;
@@ -1427,7 +1427,7 @@
             var wpsNow = getPerimeterWaypoints();
             var onBottomRoad = wpsNow[tour.wpIndex] && wpsNow[tour.wpIndex].zone === 'bottom';
             // Take the Tour Bus after visiting 2+ spots when near the road!
-            if (onBottomRoad && tour.spotsVisitedSinceBus >= 2) {
+            if (tour.spotsVisitedSinceBus >= 2) {
               tour.spotsVisitedSinceBus = 0;
               startBusPickupOnRoad();
             } else {
