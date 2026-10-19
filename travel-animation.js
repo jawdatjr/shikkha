@@ -4,14 +4,62 @@
       var ctx = canvas.getContext('2d');
       if (!ctx) return;
       var reduceMotion = false; // Always play the explicitly requested tour; respect app-only pause if added later.
+      // Android-safe animation driver: never rely on RAF alone. Some power-saving
+      // browsers pause RAF while leaving an installed PWA visibly in the foreground.
+      // A timer-backed watchdog keeps the tourist journey moving without touching POS state.
       var lastRenderTime = 0;
-      function scheduleFrame() {
-        window.requestAnimationFrame(function(now) {
-          if (document.hidden || (lastRenderTime && now - lastRenderTime < 30)) {
-            scheduleFrame(); return;
-          }
-          lastRenderTime = now;
+      var lastWallPaint = 0;
+      var rafPending = false;
+      var frameCount = 0;
+      var tourErrors = 0;
+      function safeRender(now, forced) {
+        if (document.hidden) return;
+        now = Number.isFinite(now) ? now : Date.now();
+        if (!forced && lastRenderTime && now - lastRenderTime < 30) return;
+        lastRenderTime = now;
+        try {
           updateAndRender();
+          if (forced) updateAndRender(); // compensate for RAF being throttled to ~10fps
+          lastWallPaint = Date.now();
+          frameCount++;
+          if (frameCount % 20 === 0) {
+            canvas.dataset.tourFrames = String(frameCount);
+            canvas.dataset.tourMode = tour.mode;
+          }
+          tourErrors = 0;
+        } catch (err) {
+          tourErrors++;
+          if (tourErrors < 4 && window.console) console.warn('Travel animation recovered from a drawing error:', err);
+          // If a destination drawing method is unsupported on a particular phone,
+          // keep the characters visible while recovering the trip on the next tick.
+          try {
+            ctx.clearRect(0, 0, vw, vh);
+            tour.waveTick += .12;
+            tour.timer += 1 / 20;
+            var basex = Math.max(80, Math.min(vw-80, tour.groupX || vw*.5));
+            var basey = Math.max(170, Math.min(vh-150, tour.groupY || vh*.6));
+            groupMembers.forEach(function(member,i) {
+              member.inTent=false;
+              member.x=basex+(i-(groupMembers.length-1)/2)*24+Math.sin(tour.waveTick+i)*6;
+              member.y=basey+Math.sin(i*2.4)*9;
+              member.state='walk';
+              member.phase+=.24;
+              try { drawMiniAvatar(member.x, member.y, member); } catch(avatarErr) {
+                ctx.fillStyle=member.shirt||'#0891b2';ctx.fillRect(member.x-4,member.y-18,8,14);
+                ctx.fillStyle='#f5c99b';ctx.beginPath();ctx.arc(member.x,member.y-23,5,0,Math.PI*2);ctx.fill();
+              }
+            });
+          } catch (ignored) { /* Keep the watchdog alive for next frame. */ }
+          lastWallPaint = Date.now();
+        }
+      }
+      function scheduleFrame() {
+        if (rafPending || !window.requestAnimationFrame) return;
+        rafPending = true;
+        window.requestAnimationFrame(function(now) {
+          rafPending = false;
+          safeRender(now, false);
+          scheduleFrame();
         });
       }
       if (reduceMotion) {
@@ -19,7 +67,7 @@
         canvas.setAttribute('data-reduced-motion','true');
       }
 
-      var dpr = Math.min(window.devicePixelRatio || 1, 1.4); // Mobile fullscreen animation, reduced GPU load
+      var dpr = Math.min(window.devicePixelRatio || 1, 1.2); // Mobile fullscreen animation, reduced GPU load
       var vw = window.innerWidth || 1200;
       var vh = window.innerHeight || 800;
 
@@ -1549,7 +1597,6 @@
           }
         }
 
-        if (!reduceMotion) scheduleFrame();
       }
 
       function assignSingleMemberNewSpotAction(m, idx) {
@@ -1739,5 +1786,19 @@
         }
       }
 
-      if (!reduceMotion) scheduleFrame();
+      // Immediately paint so phones with paused RAF still show the group on startup.
+      safeRender(0, false);
+      scheduleFrame();
+      window.setInterval(function() {
+        if (document.hidden) return;
+        if (Date.now() - lastWallPaint > 160) safeRender(Date.now(), true);
+        scheduleFrame();
+      }, 90);
+      document.addEventListener('visibilitychange', function() {
+        lastRenderTime=0;
+        if (!document.hidden) { safeRender(Date.now(), true); scheduleFrame(); }
+      });
+      window.addEventListener('pageshow', function() {
+        lastRenderTime=0;safeRender(Date.now(), true);scheduleFrame();
+      });
     })();
