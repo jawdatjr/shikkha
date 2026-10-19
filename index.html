@@ -2463,6 +2463,7 @@ Nearby Sadar Hospital Road.</textarea>
     <span id="toastMessage">সেভ করা হয়েছে!</span>
   </div>
 
+  <script src="./qr-generator-offline.js"></script>
   <script>
     (function () {
       'use strict';
@@ -2476,66 +2477,18 @@ Nearby Sadar Hospital Road.</textarea>
 
       // --- TRAVEL AGENCY RECEIPT THEMES ---
       var RECEIPT_THEMES = [
-        {
-          id: 'teal-classic',
-          name: 'অরিজিনাল ট্রাভেল টিল (Teal)',
-          primary: '#008996',
-          secondary: '#005a63',
-          light: '#e6f6f8',
-          border: '#6ec4cf',
-          paper: '#ffffff',
-          text: '#034d54'
-        },
-        {
-          id: 'royal-blue',
-          name: 'এভিয়েশন ব্লু (Airlines Blue)',
-          primary: '#0284c7',
-          secondary: '#0c4a6e',
-          light: '#f0f9ff',
-          border: '#7dd3fc',
-          paper: '#ffffff',
-          text: '#075985'
-        },
-        {
-          id: 'emerald-green',
-          name: 'গ্রীন এক্সপ্রেস (Green Line)',
-          primary: '#059669',
-          secondary: '#064e3b',
-          light: '#ecfdf5',
-          border: '#6ee7b7',
-          paper: '#ffffff',
-          text: '#065f46'
-        },
-        {
-          id: 'royal-purple',
-          name: 'ইন্ডিগো কোচ (Indigo Coach)',
-          primary: '#4f46e5',
-          secondary: '#312e81',
-          light: '#eef2ff',
-          border: '#a5b4fc',
-          paper: '#ffffff',
-          text: '#3730a3'
-        },
-        {
-          id: 'crimson-red',
-          name: 'নেভি ট্রাভেল পাস (Navy)',
-          primary: '#1e293b',
-          secondary: '#0f172a',
-          light: '#f1f5f9',
-          border: '#94a3b8',
-          paper: '#ffffff',
-          text: '#1e293b'
-        },
-        {
-          id: 'classic-gold',
-          name: 'হাইওয়ে অরেঞ্জ (Express)',
-          primary: '#ea580c',
-          secondary: '#7c2d12',
-          light: '#fff7ed',
-          border: '#fdba74',
-          paper: '#ffffff',
-          text: '#9a3412'
-        }
+        {id:'teal-classic',name:'অরিজিনাল ট্রাভেল টিল • Original',receiptStyle:'original',
+          primary:'#008996',secondary:'#005a63',light:'#e6f6f8',border:'#6ec4cf',paper:'#ffffff',text:'#034d54'},
+        {id:'royal-blue',name:'Royal Blue Executive',receiptStyle:'executive',
+          primary:'#143b72',secondary:'#0c2146',light:'#e8f1fc',border:'#8aaddb',paper:'#f7fbff',text:'#15365c'},
+        {id:'classic-gold',name:'Golden Luxury',receiptStyle:'luxury',
+          primary:'#a9782b',secondary:'#654413',light:'#fff8e9',border:'#d9b66e',paper:'#fffcf5',text:'#674615'},
+        {id:'royal-purple',name:'Premium Boarding Pass',receiptStyle:'boarding',
+          primary:'#5b3c9e',secondary:'#31205d',light:'#f1eefe',border:'#b8a2e5',paper:'#ffffff',text:'#3c2771'},
+        {id:'emerald-green',name:'Glass White Minimal',receiptStyle:'minimal',
+          primary:'#0e8090',secondary:'#115369',light:'#e9f9fc',border:'#c3dfe5',paper:'#ffffff',text:'#204e58'},
+        {id:'crimson-red',name:'Dark VIP Travel',receiptStyle:'darkvip',
+          primary:'#bd9a5c',secondary:'#0b1528',light:'#202e43',border:'#6c7291',paper:'#10192b',text:'#f4f3ed'}
       ];
 
       // --- DEFAULT TOUR PRESETS ---
