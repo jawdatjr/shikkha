@@ -1,26 +1,16 @@
 {
   "id": "./",
-  "name": "Ashik Shikkha — Salesman POS & Cash Manager",
+  "name": "Ashik Shikkha — Live Accounting & Salesman POS",
   "short_name": "Ashik Shikkha",
-  "description": "ট্রাভেলস রিসিপ্ট, জমা, খরচ ও বকেয়ার অফলাইন হিসাব",
+  "description": "অফলাইন-ফার্স্ট ট্রাভেল রিসিপ্ট, জমা-খরচ ও সেলসম্যান লেজার",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#008996",
+  "background_color": "#050b14",
+  "theme_color": "#064e3b",
   "lang": "bn",
   "icons": [
-    {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
   ]
 }
