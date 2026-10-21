@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Ashik Shikkha — Salesman POS & Cash Manager",
-  "short_name": "Ashik Shikkha",
-  "description": "ট্রাভেলস রিসিপ্ট, জমা, খরচ ও বকেয়ার অফলাইন হিসাব",
+  "name": "ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স — Travel Booking & Receipt",
+  "short_name": "ট্যুর লাভার্স",
+  "description": "ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স • ট্রাভেল বুকিং, মানি রিসিপ্ট, জমা-খরচ ও সেলসম্যান POS",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
