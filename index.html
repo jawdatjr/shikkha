@@ -13,7 +13,7 @@
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" type="image/png" href="./icon-192.png" />
   <link rel="apple-touch-icon" href="./icon-192.png" />
-  <title>Ashik Shikkha — Travels POS, Money Receipt &amp; Expense Manager</title>
+  <title>ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স — Travel POS</title>
   <link rel="stylesheet" href="./tailwind-offline.css" />
   <style>
     :root {
@@ -1282,34 +1282,136 @@
       .firebase-gate-card {padding:23px 20px;border-radius:19px;}
       .firebase-gate-card h2 {font-size:22px;}
     }
+
+    /* Tour Lovers premium glass login — desktop and mobile */
+    #firebaseAuthGate {
+      background:radial-gradient(ellipse 55% 65% at 12% 6%,rgba(14,165,178,.23),transparent 85%),
+        radial-gradient(ellipse 38% 45% at 92% 90%,rgba(20,98,138,.21),transparent 85%),
+        linear-gradient(153deg,#071321 0%,#071a27 52%,#08121d 100%);
+      padding:18px;isolation:isolate;
+    }
+    #firebaseAuthGate::before,#firebaseAuthGate::after {
+      content:'';pointer-events:none;position:absolute;z-index:-1;border-radius:50%;
+      border:1px solid rgba(103,232,249,.09);
+    }
+    #firebaseAuthGate::before {width:min(94vw,720px);height:min(94vw,720px);top:-365px;left:-160px;}
+    #firebaseAuthGate::after {width:min(60vw,430px);height:min(60vw,430px);bottom:-260px;right:-130px;}
+    #firebaseAuthGate .firebase-gate-card {
+      position:relative;isolation:isolate;overflow:hidden;width:min(100%,458px);
+      padding:30px 32px 23px;border-radius:24px;
+      border:1px solid rgba(110,231,243,.18);
+      background:linear-gradient(155deg,rgba(26,48,61,.98),rgba(11,28,42,.99) 63%,rgba(12,32,47,.99));
+      box-shadow:0 24px 80px rgba(0,0,0,.43),inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .firebase-login-halo {
+      position:absolute;inset:0 0 auto;height:160px;z-index:-1;pointer-events:none;
+      background:radial-gradient(circle at 50% -20%,rgba(45,212,191,.18),transparent 69%);
+    }
+    .firebase-gate-header {display:flex;justify-content:center;align-items:center;gap:13px;flex-direction:column;}
+    #firebaseAuthGate .firebase-gate-logo {
+      margin:0;width:63px;height:63px;border:1px solid rgba(255,255,255,.35);
+      border-radius:21px;background:linear-gradient(135deg,#99f6e4,#2dd4bf 52%,#22c6de);
+      box-shadow:0 10px 28px rgba(20,184,166,.24),inset 0 1px 0 #ffffffb2;
+      font-weight:950;font-size:25px;color:#05333f;letter-spacing:-1px;
+    }
+    #firebaseAuthGate .firebase-gate-tag {letter-spacing:.13em;font-size:9px;padding:6px 11px;}
+    .firebase-gate-copy {text-align:center;padding:9px 0 4px;}
+    .firebase-gate-eyebrow {font-size:9px;letter-spacing:.18em;font-weight:800;color:#5eead4;margin:5px 0;}
+    #firebaseAuthGate .firebase-gate-card h2 {
+      font-family:inherit;font-size:clamp(22px,4.2vw,27px);font-weight:900;
+      line-height:1.25;margin:8px 0 10px;color:#f0fdfa;letter-spacing:-.4px;
+    }
+    #firebaseAuthGate .firebase-gate-sub {margin:0 0 15px;color:#a7b8c9;font-size:11.5px;line-height:1.65;}
+    .firebase-gate-offer {
+      display:flex;align-items:center;gap:10px;padding:12px;margin:7px 0 18px;
+      background:linear-gradient(120deg,rgba(20,184,166,.12),rgba(14,116,144,.11));
+      border:1px solid rgba(94,234,212,.20);border-radius:14px;
+    }
+    .firebase-gate-offer-symbol {
+      display:grid;place-items:center;width:35px;height:35px;flex:0 0 35px;
+      background:rgba(45,212,191,.14);color:#5eead4;border-radius:10px;font-size:20px;
+    }
+    .firebase-gate-offer-details {min-width:0;flex:1;}
+    .firebase-gate-offer-label {font-size:9px;font-weight:800;color:#83dfd7;letter-spacing:.04em;}
+    .firebase-gate-offer-name {font-size:12px;font-weight:750;line-height:1.4;color:#f0fdfa;overflow-wrap:anywhere;margin-top:2px;}
+    .firebase-gate-offer-price {white-space:nowrap;font-size:15px;font-weight:900;color:#67e8f9;}
+    #firebaseAuthGate .firebase-gate-field {margin-bottom:14px;}
+    #firebaseAuthGate .firebase-gate-card label {font-size:12px;margin-bottom:7px;color:#d6e8ed;}
+    #firebaseAuthGate .firebase-gate-card input {border-color:#345363;border-radius:11px;background:rgba(5,22,35,.75);}
+    #firebaseAuthGate .firebase-gate-card input:focus {outline:none;border-color:#5eead4;box-shadow:0 0 0 3px rgba(45,212,191,.14);}
+    #firebaseAuthGate .firebase-gate-submit {
+      display:flex;justify-content:center;align-items:center;gap:12px;margin-top:9px;
+      border-radius:12px;transition:filter .15s,transform .15s;
+      box-shadow:0 10px 27px rgba(45,212,191,.15);
+    }
+    #firebaseAuthGate .firebase-gate-submit:hover:not(:disabled) {filter:brightness(1.09);}
+    #firebaseAuthGate .firebase-gate-message {margin:12px 0 5px;min-height:20px;}
+    .firebase-gate-local-count {margin:5px 0;color:#a7f3d0;font-size:11px;text-align:center;font-weight:750;}
+    .firebase-gate-wait {font-size:10px;text-align:center;color:#829bab;margin:4px 0;}
+    .firebase-gate-foot {
+      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 0 4px;
+      margin-top:12px;border-top:1px solid rgba(148,163,184,.16);
+      color:#9edccf;font-size:10px;font-weight:700;
+    }
+    .firebase-gate-dot {display:inline-block;width:6px;height:6px;background:#34d399;border-radius:50%;vertical-align:middle;margin-right:5px;}
+    #firebaseAuthGate .firebase-gate-notice {
+      border:0;margin:2px 0 0;padding:5px 0 0;color:#7993a5;font-size:10px;line-height:1.5;
+    }
+    @media(max-width:430px) {
+      #firebaseAuthGate {padding:12px;}
+      #firebaseAuthGate .firebase-gate-card {padding:21px 19px 17px;border-radius:21px;}
+      #firebaseAuthGate .firebase-gate-logo {width:52px;height:52px;font-size:22px;border-radius:17px;}
+      #firebaseAuthGate .firebase-gate-card h2 {font-size:23px;}
+      #firebaseAuthGate .firebase-gate-offer {padding:10px;}
+      #firebaseAuthGate .firebase-gate-sub {margin-bottom:13px;}
+    }
+    @media(max-height:680px) {#firebaseAuthGate {align-items:start;}#firebaseAuthGate .firebase-gate-card {margin:auto;}}
   </style>
   <link rel="stylesheet" href="./travel-animation.css" />
 </head>
 <body class="firebase-locked">
   <section id="firebaseAuthGate" role="dialog" aria-modal="true" aria-labelledby="firebaseGateHeading">
     <div class="firebase-gate-card">
-      <div class="firebase-gate-logo" aria-hidden="true">AS</div>
-      <div style="text-align:center"><span class="firebase-gate-tag">PRIVATE • STAFF ACCESS</span></div>
-      <h2 id="firebaseGateHeading">Ashik Shikkha</h2>
-      <p class="firebase-gate-sub">Travel Pass, Money Receipt &amp; Sales Dashboard<br />Owner অথবা অনুমোদিত Salesman হিসেবে লগইন করুন।</p>
+      <div class="firebase-login-halo" aria-hidden="true"></div>
+      <div class="firebase-gate-header">
+        <div class="firebase-gate-logo" aria-hidden="true">TL</div>
+        <div class="firebase-gate-tag">✦ PRIVATE STAFF PORTAL</div>
+      </div>
+      <div class="firebase-gate-copy">
+        <p class="firebase-gate-eyebrow">TOUR • TRAVEL • MEMORIES</p>
+        <h2 id="firebaseGateHeading">ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স</h2>
+        <p class="firebase-gate-sub">প্রিমিয়াম বুকিং ও মানি রিসিপ্ট ম্যানেজমেন্ট<br />Owner এবং অনুমোদিত Salesman Login</p>
+      </div>
+      <div class="firebase-gate-offer" aria-label="চলতি ট্যুরের তথ্য">
+        <div class="firebase-gate-offer-symbol" aria-hidden="true">✈</div>
+        <div class="firebase-gate-offer-details">
+          <div class="firebase-gate-offer-label">চলতি ট্যুর • TOUR SPOTLIGHT</div>
+          <div id="firebaseGateTourTitle" class="firebase-gate-offer-name">সিলেট - সাদাপাথর ডে ট্যুর</div>
+        </div>
+        <div id="firebaseGateTourPrice" class="firebase-gate-offer-price">৳১,৪৯৯</div>
+      </div>
       <form id="firebaseGateForm">
         <div class="firebase-gate-field">
-          <label for="firebaseGateEmail">Firebase Email</label>
-          <input id="firebaseGateEmail" type="email" placeholder="name@example.com" autocomplete="username" inputmode="email" required />
+          <label for="firebaseGateEmail">Email Address</label>
+          <input id="firebaseGateEmail" type="email" placeholder="yourname@example.com" autocomplete="username" inputmode="email" required />
         </div>
         <div class="firebase-gate-field">
           <label for="firebaseGatePassword">Password</label>
           <div class="firebase-gate-password">
-            <input id="firebaseGatePassword" type="password" placeholder="আপনার Password" autocomplete="current-password" required />
+            <input id="firebaseGatePassword" type="password" placeholder="আপনার পাসওয়ার্ড লিখুন" autocomplete="current-password" required />
             <button id="firebaseGateTogglePassword" type="button" class="firebase-gate-show" aria-label="Show password">Show</button>
           </div>
         </div>
-        <button id="firebaseGateSubmit" class="firebase-gate-submit" type="submit" disabled>🔐 Secure Login</button>
+        <button id="firebaseGateSubmit" class="firebase-gate-submit" type="submit" disabled><span>লগইন করুন</span><span aria-hidden="true">→</span></button>
       </form>
-      <p id="firebaseGateMessage" class="firebase-gate-message" role="status" aria-live="polite">Firebase session যাচাই করা হচ্ছে…</p>
-      <p id="firebaseGateLocalCount" style="font-size:12px;font-weight:750;text-align:center;color:#a7f3d0;margin:4px 0 14px"></p>
-      <p id="firebaseGateWait" style="text-align:center;font-size:11px;color:#94a3b8">Connecting to Firebase…</p>
-      <p class="firebase-gate-notice">শুধু Firebase Authentication-এ তৈরি ও <b>members</b> Collection-এ অনুমোদিত অ্যাকাউন্ট লগইন করতে পারবে।<br />অফলাইন হিসাব ফোনে থাকে—Sync সফল না হওয়া পর্যন্ত JSON Backup রাখুন।</p>
+      <p id="firebaseGateMessage" class="firebase-gate-message" role="status" aria-live="polite">আপনার Session যাচাই হচ্ছে…</p>
+      <p id="firebaseGateLocalCount" class="firebase-gate-local-count"></p>
+      <p id="firebaseGateWait" class="firebase-gate-wait">Connecting securely…</p>
+      <div class="firebase-gate-foot">
+        <span><span class="firebase-gate-dot"></span> Firebase Staff Access</span>
+        <span>◈ Offline-first POS</span>
+      </div>
+      <p class="firebase-gate-notice">একই ডিভাইসে একবার লগইন করলে Session সংরক্ষিত থাকবে। অফলাইন হিসাবের জন্য নিয়মিত JSON Backup রাখুন।</p>
     </div>
   </section>
   <div id="appRoot" class="app-shell" inert>
@@ -2276,7 +2378,7 @@
         <section id="panelSettings" class="panel-card">
           <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
             <div>
-              <h2 class="text-base font-extrabold text-slate-900">⚙️ Ashik Shikkha — সেটিংস ও ভাষা (Settings &amp; Language)</h2>
+              <h2 class="text-base font-extrabold text-slate-900">⚙️ ট্যুর লাভার্স — সেটিংস ও ভাষা (Settings &amp; Language)</h2>
               <p class="text-xs text-slate-500">ভাষা (বাংলা/English), কোম্পানির নাম, মোবাইল নাম্বার, ঠিকানা ও লোগো পরিবর্তন করুন</p>
             </div>
             <button type="button" id="btnResetSettings" class="btn btn-danger text-xs py-1.5 px-3">
@@ -4294,6 +4396,7 @@
         applyLayoutMode(appState.settings.layoutMode || 'clean');
         applyLanguage(appState.settings.language || 'bn');
         renderThemeButtons();
+        window.dispatchEvent(new Event('shikkha-brand-updated'));
       }
 
       function syncSettingsToInputs() {
@@ -5511,6 +5614,7 @@
           applyLanguage('bn');
           renderThemeButtons();
           updateLiveReceipt();
+          window.dispatchEvent(new Event('shikkha-brand-updated'));
           showToast('ডিফল্ট সেটিংস রিসেট করা হয়েছে!', '🔄');
         });
 
