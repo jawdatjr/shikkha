@@ -45,8 +45,9 @@ function verifiedCache(user) {
     const data = JSON.parse(localStorage.getItem(MEMBER_CACHE_KEY) || 'null');
     if (!data || data.uid !== user.uid || !data.displayName ||
         !['owner','salesman'].includes(data.role) || !Number.isFinite(data.savedAt)) return null;
-    // Do not keep trusting authorization metadata indefinitely.
-    if (data.savedAt > Date.now() || Date.now() - data.savedAt > 24 * 60 * 60 * 1000) return null;
+    // Persist local access on this device until Firebase explicitly signs out.
+    // The server membership is revalidated asynchronously on every online launch.
+    if (data.savedAt > Date.now()) return null;
     return { uid: data.uid, displayName: data.displayName, role: data.role };
   } catch (_) {
     return null;
