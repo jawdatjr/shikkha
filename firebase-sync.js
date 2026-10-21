@@ -24,12 +24,13 @@ const db = getFirestore(app);
 const CURSOR_KEY = 'ashik_firebase_events_cursor_v1';
 let member = null;
 let memberError = '';
+let authReady = false;
 const listeners = new Set();
 let currentCheck = Promise.resolve();
 
 function notify() {
   listeners.forEach(fn => {
-    try { fn(member, memberError); } catch (err) { console.warn('Firebase status listener', err); }
+    try { fn(member, memberError, authReady); } catch (err) { console.warn('Firebase status listener', err); }
   });
 }
 async function getActiveMember(user) {
@@ -43,6 +44,7 @@ async function getActiveMember(user) {
 function updateMember(nextMember, error = '') {
   member = nextMember;
   memberError = error;
+  authReady = true;
   notify();
 }
 onAuthStateChanged(auth, user => {
@@ -174,10 +176,11 @@ window.shikkhaFirebase = {
   signIn, logOut, sync, ackCursor, resetCursor,
   subscribe(callback) {
     listeners.add(callback);
-    callback(member, memberError);
+    callback(member, memberError, authReady);
     return () => listeners.delete(callback);
   },
   get member() { return member; },
-  get error() { return memberError; }
+  get error() { return memberError; },
+  get authReady() { return authReady; }
 };
 window.dispatchEvent(new Event('shikkha-firebase-ready'));
