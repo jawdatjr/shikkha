@@ -1,4 +1,9 @@
-# Ashik Shikkha — Offline Salesman POS + Auto GitHub Backup (v2)
+# Ashik Shikkha — Offline Salesman POS + Firebase Sync
+
+> **নতুন Firebase সংস্করণ (2026-10-21):** Cloudflare Worker ছাড়াই Firebase Authentication + Cloud Firestore-এর জন্য অ্যাপের কোড প্রস্তুত করা হয়েছে। **Firebase Console-এ Authentication, production Firestore rules এবং অনুমোদিত সেলসম্যান accounts চালু না করলে online sync কাজ করবে না।** প্রথমে [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) অনুসরণ করুন। পুরোনো Cloudflare/GitHub Worker পদ্ধতি নিচে শুধু ঐতিহাসিক/legacy নির্দেশনা হিসেবে রাখা হয়েছে।
+
+## Legacy Cloudflare instructions (not used by the current Firebase UI)
+
 
 ## কী কী কাজ করে
 - Android ও iPhone-এ HTTPS GitHub Pages থেকে প্রথমবার লোড/ইনস্টল করার পর PWA-এর অ্যাপ শেল অফলাইনে ক্যাশ হয় (`sw.js`)। রিসিপ্ট/খরচের হিসাব **আগে সেই ফোনে** সেভ হয়। অফলাইন অবস্থায়ও create/edit/delete/history/dashboard চলে।
