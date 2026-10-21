@@ -2306,22 +2306,22 @@
 
           <div class="form-group">
             <label class="form-label" for="inpCompanyBn">প্রতিষ্ঠানের নাম — বাংলা (Company Name Bangla)</label>
-            <input type="text" id="inpCompanyBn" class="form-input font-bold" value="ব্রাহ্মণবাড়িয়া ট্রাভেলার্স" />
+            <input type="text" id="inpCompanyBn" class="form-input font-bold" value="ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স" />
           </div>
 
           <div class="form-group">
             <label class="form-label" for="inpCompanyEn">প্রতিষ্ঠানের নাম — ইংরেজি (Subtitle / English)</label>
-            <input type="text" id="inpCompanyEn" class="form-input font-semibold" value="BRAHMANBARIA TRAVELLERS" />
+            <input type="text" id="inpCompanyEn" class="form-input font-semibold" value="BRAHMANBARIA TOUR LOVERS" />
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="form-group">
               <label class="form-label" for="inpPhone1">হটলাইন / মোবাইল ১ (Phone 1)</label>
-              <input type="text" id="inpPhone1" class="form-input" value="+880 1791-176140" />
+              <input type="text" id="inpPhone1" class="form-input" value="01731-767556" />
             </div>
             <div class="form-group">
               <label class="form-label" for="inpPhone2">হটলাইন / মোবাইল ২ (Phone 2)</label>
-              <input type="text" id="inpPhone2" class="form-input" value="+880 1726-308068" />
+              <input type="text" id="inpPhone2" class="form-input" value="01870537293" />
             </div>
           </div>
 
@@ -2336,8 +2336,7 @@
 
           <div class="form-group">
             <label class="form-label" for="inpCompanyAddress">অফিসের ঠিকানা (Office Address)</label>
-            <textarea id="inpCompanyAddress" rows="2" class="form-textarea">Kumarshil mur (Kismat Medical)
-Nearby Sadar Hospital Road.</textarea>
+            <textarea id="inpCompanyAddress" rows="2" class="form-textarea">খুরশিদ প্লাজা, টি.এ. রোড, ফকিরাপুল, ব্রাহ্মণবাড়িয়া।</textarea>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2367,6 +2366,27 @@ Nearby Sadar Hospital Road.</textarea>
             <input type="text" id="inpFooterNotice" class="form-input font-semibold" value="Advance Money is not Refundable" />
           </div>
 
+          <section class="p-3.5 rounded-xl border border-cyan-200 bg-cyan-50/70 my-4" aria-label="ডিফল্ট ট্যুর প্যাকেজ">
+            <h3 class="font-extrabold text-slate-900 text-sm mb-1">🚌 চলতি ট্যুর অফার ও বুকিং তথ্য</h3>
+            <p class="text-xs text-slate-600 mb-3">সিলেট–সাদাপাথরের তথ্য ডিফল্ট। ভবিষ্যতে নাম, দাম ও বিজ্ঞপ্তি পরিবর্তন করে নিচে Save করলে সংরক্ষিত থাকবে। ট্যুর নাম/দাম Quick Package-এও আপডেট হবে।</p>
+            <div class="form-group">
+              <label class="form-label" for="inpTourTitle">চলতি ট্যুরের নাম (Default Tour)</label>
+              <input type="text" id="inpTourTitle" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inpTourRate">জনপ্রতি ট্যুর মূল্য (৳)</label>
+              <input type="number" min="0" step="1" id="inpTourRate" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inpBookingContact3">অতিরিক্ত বুকিং যোগাযোগ / bKash</label>
+              <input type="text" id="inpBookingContact3" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="inpTourAnnouncement">সম্পূর্ণ ট্যুর বিজ্ঞপ্তি, সময়সূচি ও অন্তর্ভুক্ত সুবিধা</label>
+              <textarea id="inpTourAnnouncement" class="form-textarea" rows="9" style="line-height:1.6" placeholder="বাস, খাবার, ভ্রমণস্থান, সময়, বুকিং যোগাযোগ ইত্যাদি"></textarea>
+              <p class="text-[11px] text-slate-500 mt-1">পরের ট্যুরে তথ্য বদলালে এই বিজ্ঞপ্তিও আপডেট করে Save করুন।</p>
+            </div>
+          </section>
           <div class="form-group">
             <label class="form-label">ট্রাভেল এজেন্সি লোগো (Optional Custom Logo)</label>
             <div class="flex items-center gap-2">
@@ -2599,35 +2619,44 @@ Nearby Sadar Hospital Road.</textarea>
           primary:'#c7a66c',secondary:'#101725',light:'#232e40',border:'#857250',paper:'#101725',text:'#f4f3ed'}
       ];
 
-      // --- DEFAULT TOUR PRESETS ---
+      // --- OFFICIAL TOUR OFFER (editable defaults) ---
       var DEFAULT_PRESETS = [
-        { eventName: 'বান্দরবান - ২২-১০-২৬', rate: 5000, seatHint: 'Seat: A1, A2 (AC Bus)' },
-        { eventName: 'কক্সবাজার লাক্সারি ট্যুর - ২৫-১০-২৬', rate: 4500, seatHint: 'AC Sleeper Coach' },
-        { eventName: 'সাজেক ভ্যালি গ্রুপ ট্যুর - ৩০-১০-২৬', rate: 4200, seatHint: 'Chander Gari + Resort' },
-        { eventName: 'সিলেট ও টাঙ্গুয়ার হাওর - ০৫-১১-২৬', rate: 3800, seatHint: 'Luxury Houseboat' }
+        {eventName:"সিলেট - সাদাপাথর ডে ট্যুর (৫–৬ নভেম্বর ২০২৬)",rate:1499,seatHint:'রিজার্ভ বাস • আশুগঞ্জ, অবকাশ • ৫ নভেম্বর রাত ১১টা',managedTour:true}
       ];
-
-      // --- DEFAULT SETTINGS ---
+      var LEGACY_PRESET_NAMES=['বান্দরবান - ২২-১০-২৬','কক্সবাজার লাক্সারি ট্যুর - ২৫-১০-২৬','সাজেক ভ্যালি গ্রুপ ট্যুর - ৩০-১০-২৬','সিলেট ও টাঙ্গুয়ার হাওর - ০৫-১১-২৬'];
+      var TOUR_SEEDED_KEY='mrs_official_tour_offer_seed_v1';
+      var BRAND_MIGRATED_KEY='mrs_tour_lovers_defaults_migrated_v1';
+      var OLD_COMPANY_DEFAULTS={
+        companyBn:'ব্রাহ্মণবাড়িয়া ট্রাভেলার্স',
+        companyEn:'BRAHMANBARIA TRAVELLERS',
+        phone1:'+880 1791-176140',
+        phone2:'+880 1726-308068',
+        address:'Kumarshil mur (Kismat Medical)\nNearby Sadar Hospital Road.'
+      };
       var DEFAULT_SETTINGS = {
-        appName: 'Ashik Shikkha',
-        language: 'bn',
-        companyBn: 'ব্রাহ্মণবাড়িয়া ট্রাভেলার্স',
-        companyEn: 'BRAHMANBARIA TRAVELLERS',
-        phone1: '+880 1791-176140',
-        phone2: '+880 1726-308068',
-        address: 'Kumarshil mur (Kismat Medical)\nNearby Sadar Hospital Road.',
-        receiptBadge: 'Money Receipt',
-        eventFieldLabel: 'Event Name:',
-        signatoryLabel: 'কর্তৃপক্ষের স্বাক্ষর (Authorized Signature)',
-        secretKey: 'BT-2026-SECRET',
-        footerNotice: 'Advance Money is not Refundable',
-        themeId: 'teal-classic',
-        layoutMode: 'clean',
-        logoDataUrl: '',
-        bkashNumber: '',
-        salesmen: ['কাউন্টার ১'],
-        animationEnabled: true,
-        animationOpacity: 100
+        appName:'ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স',
+        language:'bn',
+        companyBn:'ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স',
+        companyEn:'BRAHMANBARIA TOUR LOVERS',
+        phone1:'01731-767556',
+        phone2:'01870537293',
+        address:'খুরশিদ প্লাজা, টি.এ. রোড, ফকিরাপুল, ব্রাহ্মণবাড়িয়া।',
+        receiptBadge:'Money Receipt',
+        eventFieldLabel:'Event Name:',
+        signatoryLabel:'কর্তৃপক্ষের স্বাক্ষর (Authorized Signature)',
+        secretKey:'BT-2026-SECRET',
+        footerNotice:'Advance Money is not Refundable',
+        tourTitle:"সিলেট - সাদাপাথর ডে ট্যুর (৫–৬ নভেম্বর ২০২৬)",
+        tourRate:1499,
+        tourAnnouncement:"ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স\nসিলেট - সাদাপাথর ডে ট্যুর মাত্র ১৪৯৯ টাকা।\n৫ নভেম্বর বৃহস্পতিবার রাত ১১টায় আশুগঞ্জ (গোল চত্বর), অবকাশ থেকে রওনা।\n৬ নভেম্বর শুক্রবার সারাদিন ঘুরবো; রাত ১০টার মধ্যে ব্রাহ্মণবাড়িয়া ফিরব।\nরিজার্ভ বাসে যাওয়া-আসা।\nসকালের নাস্তা, দুপুরের খাবার, সন্ধ্যায় হালকা নাস্তা।\nভ্রমণস্থান: শাহজালাল মাজার, মালনীছড়া চা বাগান, সাদাপাথর।\nদ্রুত বুকিং করুন: 01731-767556 — Ajob Hridoy; 01620328942 (bKash Personal) — Ashik Ahmed; 01870537293 — Sakib Ahmed।\nঅফিস: খুরশিদ প্লাজা, টি.এ. রোড, ফকিরাপুল, ব্রাহ্মণবাড়িয়া।",
+        bookingContact3:'01620328942 — Ashik Ahmed (bKash Personal)',
+        themeId:'teal-classic',
+        layoutMode:'clean',
+        logoDataUrl:'',
+        bkashNumber:'01620328942',
+        salesmen:['Ajob Hridoy','Ashik Ahmed','Sakib Ahmed'],
+        animationEnabled:true,
+        animationOpacity:100
       };
 
       // --- BILINGUAL DICTIONARY (Bangla & English) ---
@@ -3140,19 +3169,33 @@ Nearby Sadar Hospital Road.</textarea>
         if (raw) {
           try {
             var parsed = JSON.parse(raw);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              appState.presets = parsed;
-            }
+            if (Array.isArray(parsed)) appState.presets = parsed;
           } catch (e) {
             appState.presets = cloneObj(DEFAULT_PRESETS);
           }
         }
+        if (safeGetStorage(TOUR_SEEDED_KEY) !== 'yes') {
+          var previous = cloneObj(appState.presets);
+          var oldSample = previous.length === LEGACY_PRESET_NAMES.length &&
+            previous.every(function(p,i){ return p && p.eventName === LEGACY_PRESET_NAMES[i]; });
+          if (oldSample) appState.presets = [];
+          if (!appState.presets.some(function(p){ return p && p.managedTour === true; }))
+            appState.presets.unshift(cloneObj(DEFAULT_PRESETS[0]));
+          if (savePresetsToStorage()) safeSetStorage(TOUR_SEEDED_KEY,'yes');
+          else appState.presets = previous;
+        }
+        appState.presets.forEach(function(p){
+          if (p.managedTour === true) {
+            p.eventName = appState.settings.tourTitle || DEFAULT_SETTINGS.tourTitle;
+            p.rate = Number(appState.settings.tourRate) || DEFAULT_SETTINGS.tourRate;
+          }
+        });
         renderPresetBars();
         if(!document.getElementById('inpEventName').value.trim())setDefaultEventForNewReceipt();
       }
 
       function savePresetsToStorage() {
-        safeSetStorage(STORAGE_PRESETS_KEY, JSON.stringify(appState.presets));
+        return safeSetStorage(STORAGE_PRESETS_KEY, JSON.stringify(appState.presets));
       }
 
       function renderPresetBars() {
@@ -4229,7 +4272,19 @@ Nearby Sadar Hospital Road.</textarea>
         if (raw) {
           try {
             var parsed = JSON.parse(raw);
-            appState.settings = Object.assign({}, DEFAULT_SETTINGS, parsed);
+            if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+              if (safeGetStorage(BRAND_MIGRATED_KEY) !== 'yes') {
+                Object.keys(OLD_COMPANY_DEFAULTS).forEach(function(k){
+                  if (parsed[k] === OLD_COMPANY_DEFAULTS[k]) parsed[k] = DEFAULT_SETTINGS[k];
+                });
+                if (!String(parsed.bkashNumber || '').trim()) parsed.bkashNumber = DEFAULT_SETTINGS.bkashNumber;
+                if (Array.isArray(parsed.salesmen) && parsed.salesmen.length === 1 &&
+                    parsed.salesmen[0] === 'কাউন্টার ১') parsed.salesmen = cloneObj(DEFAULT_SETTINGS.salesmen);
+                if (!parsed.appName || parsed.appName === 'Ashik Shikkha') parsed.appName = DEFAULT_SETTINGS.appName;
+                if (safeSetStorage(STORAGE_SETTINGS_KEY, JSON.stringify(parsed))) safeSetStorage(BRAND_MIGRATED_KEY,'yes');
+              }
+              appState.settings = Object.assign({}, DEFAULT_SETTINGS, parsed);
+            }
           } catch (e) {
             appState.settings = cloneObj(DEFAULT_SETTINGS);
           }
@@ -4254,6 +4309,10 @@ Nearby Sadar Hospital Road.</textarea>
         document.getElementById('inpSignatoryLabel').value = s.signatoryLabel || '';
         document.getElementById('inpSecretKey').value = s.secretKey || '';
         document.getElementById('inpFooterNotice').value = s.footerNotice || '';
+        document.getElementById('inpTourTitle').value = s.tourTitle || '';
+        document.getElementById('inpTourRate').value = s.tourRate == null ? '' : String(s.tourRate);
+        document.getElementById('inpTourAnnouncement').value = s.tourAnnouncement || '';
+        document.getElementById('inpBookingContact3').value = s.bookingContact3 || '';
       }
 
       function readInputsToSettings() {
@@ -4269,13 +4328,25 @@ Nearby Sadar Hospital Road.</textarea>
           eventFieldLabel: document.getElementById('inpEventFieldLabel').value,
           signatoryLabel: document.getElementById('inpSignatoryLabel').value,
           secretKey: document.getElementById('inpSecretKey').value,
-          footerNotice: document.getElementById('inpFooterNotice').value
+          footerNotice: document.getElementById('inpFooterNotice').value,
+          tourTitle: document.getElementById('inpTourTitle').value.trim(),
+          tourRate: Math.max(0, Number(document.getElementById('inpTourRate').value) || 0),
+          tourAnnouncement: document.getElementById('inpTourAnnouncement').value,
+          bookingContact3: document.getElementById('inpBookingContact3').value
         });
         if (!safeSetStorage(STORAGE_SETTINGS_KEY, JSON.stringify(updated))) {
           showToast('ফোনে জায়গা নেই/স্টোরেজ বন্ধ: সেটিংস সেভ হয়নি। আগের সেভ করা সেটিংস অক্ষত আছে।', '⚠️');
           return false;
         }
         appState.settings = updated;
+        var primary = appState.presets.find(function(p){return p && p.managedTour === true;});
+        if (primary) {
+          primary.eventName = updated.tourTitle || DEFAULT_SETTINGS.tourTitle;
+          primary.rate = updated.tourRate;
+          if (!savePresetsToStorage()) showToast('সেটিংস সেভ হয়েছে; কুইক-প্যাকেজ সেভ হয়নি।','⚠️');
+          renderPresetBars();
+        }
+        window.dispatchEvent(new Event('shikkha-brand-updated'));
         updateLiveReceipt();
         return true;
       }
