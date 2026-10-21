@@ -2480,6 +2480,10 @@
               <input type="number" min="0" step="1" id="inpTourRate" class="form-input" />
             </div>
             <div class="form-group">
+              <label class="form-label" for="inpTourSeatHint">বাস / যাত্রাস্থল ও সময় (Quick Package-এ দেখাবে)</label>
+              <input type="text" id="inpTourSeatHint" class="form-input" />
+            </div>
+            <div class="form-group">
               <label class="form-label" for="inpBookingContact3">অতিরিক্ত বুকিং যোগাযোগ / bKash</label>
               <input type="text" id="inpBookingContact3" class="form-input" />
             </div>
@@ -2750,6 +2754,7 @@
         footerNotice:'Advance Money is not Refundable',
         tourTitle:"সিলেট - সাদাপাথর ডে ট্যুর (৫–৬ নভেম্বর ২০২৬)",
         tourRate:1499,
+        tourSeatHint:"রিজার্ভ বাস • আশুগঞ্জ (গোল চত্বর), অবকাশ • ৫ নভেম্বর রাত ১১টা",
         tourAnnouncement:"ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স\nসিলেট - সাদাপাথর ডে ট্যুর মাত্র ১৪৯৯ টাকা।\n৫ নভেম্বর বৃহস্পতিবার রাত ১১টায় আশুগঞ্জ (গোল চত্বর), অবকাশ থেকে রওনা।\n৬ নভেম্বর শুক্রবার সারাদিন ঘুরবো; রাত ১০টার মধ্যে ব্রাহ্মণবাড়িয়া ফিরব।\nরিজার্ভ বাসে যাওয়া-আসা।\nসকালের নাস্তা, দুপুরের খাবার, সন্ধ্যায় হালকা নাস্তা।\nভ্রমণস্থান: শাহজালাল মাজার, মালনীছড়া চা বাগান, সাদাপাথর।\nদ্রুত বুকিং করুন: 01731-767556 — Ajob Hridoy; 01620328942 (bKash Personal) — Ashik Ahmed; 01870537293 — Sakib Ahmed।\nঅফিস: খুরশিদ প্লাজা, টি.এ. রোড, ফকিরাপুল, ব্রাহ্মণবাড়িয়া।",
         bookingContact3:'01620328942 — Ashik Ahmed (bKash Personal)',
         themeId:'teal-classic',
@@ -3289,6 +3294,7 @@
         appState.presets.forEach(function(p){
           if (p.managedTour === true) {
             p.eventName = appState.settings.tourTitle || DEFAULT_SETTINGS.tourTitle;
+            p.seatHint = appState.settings.tourSeatHint || DEFAULT_SETTINGS.tourSeatHint;
             var chosenRate = Number(appState.settings.tourRate);
             p.rate = Number.isFinite(chosenRate) && chosenRate >= 0 ? chosenRate : DEFAULT_SETTINGS.tourRate;
           }
@@ -4415,6 +4421,7 @@
         document.getElementById('inpFooterNotice').value = s.footerNotice || '';
         document.getElementById('inpTourTitle').value = s.tourTitle || '';
         document.getElementById('inpTourRate').value = s.tourRate == null ? '' : String(s.tourRate);
+        document.getElementById('inpTourSeatHint').value = s.tourSeatHint || '';
         document.getElementById('inpTourAnnouncement').value = s.tourAnnouncement || '';
         document.getElementById('inpBookingContact3').value = s.bookingContact3 || '';
       }
@@ -4435,6 +4442,7 @@
           footerNotice: document.getElementById('inpFooterNotice').value,
           tourTitle: document.getElementById('inpTourTitle').value.trim(),
           tourRate: Math.max(0, Number(document.getElementById('inpTourRate').value) || 0),
+          tourSeatHint: document.getElementById('inpTourSeatHint').value.trim(),
           tourAnnouncement: document.getElementById('inpTourAnnouncement').value,
           bookingContact3: document.getElementById('inpBookingContact3').value
         });
@@ -4447,6 +4455,7 @@
         if (primary) {
           primary.eventName = updated.tourTitle || DEFAULT_SETTINGS.tourTitle;
           primary.rate = updated.tourRate;
+          primary.seatHint = updated.tourSeatHint || '';
           if (!savePresetsToStorage()) showToast('সেটিংস সেভ হয়েছে; কুইক-প্যাকেজ সেভ হয়নি।','⚠️');
           renderPresetBars();
         }
@@ -5618,6 +5627,7 @@
             if (p && p.managedTour === true) {
               p.eventName = DEFAULT_SETTINGS.tourTitle;
               p.rate = DEFAULT_SETTINGS.tourRate;
+              p.seatHint = DEFAULT_SETTINGS.tourSeatHint;
             }
           });
           savePresetsToStorage();
