@@ -158,11 +158,13 @@ async function sync(batch) {
   }
   const applied = [];
   const conflicts = [];
+  const blocked = new Set();
   for (const event of batch) {
+    const key = event.entity + ':' + event.entityId;
+    if (blocked.has(key)) continue; // Preserve the pending per-record event chain.
     const result = await appendEvent(event);
     if (result.applied) applied.push(event.id);
-    else conflicts.push(result.conflict);
-    // A conflict blocks later local events for the same entity until the user resolves it.
+    else { conflicts.push(result.conflict); blocked.add(key); }
   }
   const remote = await fetchEvents();
   return { applied, conflicts, ...remote };
