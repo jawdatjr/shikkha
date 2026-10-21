@@ -3289,7 +3289,8 @@
         appState.presets.forEach(function(p){
           if (p.managedTour === true) {
             p.eventName = appState.settings.tourTitle || DEFAULT_SETTINGS.tourTitle;
-            p.rate = Number(appState.settings.tourRate) || DEFAULT_SETTINGS.tourRate;
+            var chosenRate = Number(appState.settings.tourRate);
+            p.rate = Number.isFinite(chosenRate) && chosenRate >= 0 ? chosenRate : DEFAULT_SETTINGS.tourRate;
           }
         });
         renderPresetBars();
@@ -5613,6 +5614,14 @@
           applyLayoutMode('clean');
           applyLanguage('bn');
           renderThemeButtons();
+          appState.presets.forEach(function(p){
+            if (p && p.managedTour === true) {
+              p.eventName = DEFAULT_SETTINGS.tourTitle;
+              p.rate = DEFAULT_SETTINGS.tourRate;
+            }
+          });
+          savePresetsToStorage();
+          renderPresetBars();
           updateLiveReceipt();
           window.dispatchEvent(new Event('shikkha-brand-updated'));
           showToast('ডিফল্ট সেটিংস রিসেট করা হয়েছে!', '🔄');
