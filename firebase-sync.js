@@ -1,7 +1,7 @@
 // Ashik Shikkha Firebase backend (browser module, CDN; no private service key).
 // Offline receipt saves remain in index.html localStorage until this module can sync.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/13.0.0/firebase-auth.js';
 import {
   getFirestore, doc, collection, getDocFromServer, getDocsFromServer,
   query, orderBy, documentId, startAfter, limit, Timestamp,
@@ -20,20 +20,49 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+// Remember the Firebase Auth session in this browser/profile until explicit sign-out.
+// Passwords are never written to localStorage by the app.
+const persistenceReady = setPersistence(auth, browserLocalPersistence);
 const db = getFirestore(app);
 const CURSOR_KEY = 'ashik_firebase_events_cursor_v1';
+const MEMBER_CACHE_KEY = 'ashik_firebase_verified_member_v1';
 let member = null;
 let memberError = '';
 let authReady = false;
 const listeners = new Set();
 let currentCheck = Promise.resolve();
+let verificationPromise = null;
+let verifyingUid = null;
 
 function notify() {
   listeners.forEach(fn => {
     try { fn(member, memberError, authReady); } catch (err) { console.warn('Firebase status listener', err); }
   });
 }
+function verifiedCache(user) {
+  if (!user) return null;
+  try {
+    const data = JSON.parse(localStorage.getItem(MEMBER_CACHE_KEY) || 'null');
+    if (!data || data.uid !== user.uid || !data.displayName ||
+        !['owner','salesman'].includes(data.role) || !Number.isFinite(data.savedAt)) return null;
+    // Do not keep trusting authorization metadata indefinitely.
+    if (data.savedAt > Date.now() || Date.now() - data.savedAt > 24 * 60 * 60 * 1000) return null;
+    return { uid: data.uid, displayName: data.displayName, role: data.role };
+  } catch (_) {
+    return null;
+  }
+}
+function saveVerified(memberData) {
+  try { localStorage.setItem(MEMBER_CACHE_KEY, JSON.stringify({...memberData, savedAt: Date.now()})); }
+  catch (_) {} // A session still works even when local storage is unavailable.
+}
+function clearVerified() {
+  try { localStorage.removeItem(MEMBER_CACHE_KEY); } catch (_) {}
+}
 async function getActiveMember(user) {
+  // A network read is mandatory on the FIRST login and is periodically repeated.
+  // On a trusted returning browser, the most recent verified member may unlock
+  // the UI first, while Firestore revalidates it asynchronously.
   const snapshot = await getDocFromServer(doc(db, 'members', user.uid));
   const data = snapshot.exists() ? snapshot.data() : null;
   if (!data || data.active !== true || !['owner', 'salesman'].includes(data.role) || !data.displayName) {
@@ -41,31 +70,81 @@ async function getActiveMember(user) {
   }
   return { uid: user.uid, displayName: String(data.displayName), role: data.role };
 }
-function updateMember(nextMember, error = '') {
+function updateMember(nextMember, error = '', initialized = true) {
   member = nextMember;
   memberError = error;
-  authReady = true;
+  authReady = initialized;
   notify();
 }
-onAuthStateChanged(auth, user => {
-  currentCheck = (async () => {
-    if (!user) { updateMember(null); return; }
-    try {
-      updateMember(await getActiveMember(user));
-    } catch (err) {
-      updateMember(null, err.message || String(err));
+function transientNetworkFailure(err) {
+  const code = (err && err.code) || '';
+  return code === 'unavailable' || code === 'deadline-exceeded' ||
+    code === 'failed-precondition' && typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+function verifyMembership(user) {
+  if (verificationPromise && verifyingUid === user.uid) return verificationPromise;
+  verifyingUid = user.uid;
+  const promise = getActiveMember(user).then(verified => {
+    if (auth.currentUser && auth.currentUser.uid === user.uid) {
+      saveVerified(verified);
+      updateMember(verified);
     }
-  })();
+    return verified;
+  }).catch(err => {
+    if (auth.currentUser && auth.currentUser.uid === user.uid) {
+      if (verifiedCache(user) && transientNetworkFailure(err)) {
+        // In an offline PWA, preserve the previously authenticated local view;
+        // Firestore rules continue to deny cloud access when not authorized.
+        updateMember(verifiedCache(user), 'Offline • আগের যাচাইকৃত Session চালু আছে');
+      } else {
+        clearVerified();
+        updateMember(null, err.message || String(err));
+      }
+    }
+    throw err;
+  }).finally(() => {
+    if (verificationPromise === promise) {
+      verificationPromise = null;
+      verifyingUid = null;
+    }
+  });
+  verificationPromise = promise;
+  return promise;
+}
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    clearVerified();
+    updateMember(null);
+    currentCheck = Promise.resolve();
+    return;
+  }
+  const cached = verifiedCache(user);
+  if (cached) {
+    // Fast relaunch on the same device; never use cached details for a new UID.
+    updateMember(cached);
+  } else {
+    updateMember(null, '', false); // Keep screen locked until first server verification.
+  }
+  currentCheck = verifyMembership(user).catch(() => {});
+}, err => {
+  updateMember(null, err.message || String(err));
 });
 
 async function signIn(email, password) {
+  // Firebase LOCAL persistence ensures the next launch does not need a password.
+  await persistenceReady;
   const credential = await signInWithEmailAndPassword(auth, email.trim(), password);
-  const nextMember = await getActiveMember(credential.user);
-  updateMember(nextMember);
-  return nextMember;
+  const cached = verifiedCache(credential.user);
+  if (cached) {
+    updateMember(cached);
+    return cached;
+  }
+  // Share an in-flight membership read with onAuthStateChanged: no duplicate request.
+  return await verifyMembership(credential.user);
 }
 async function logOut() {
   await signOut(auth);
+  clearVerified();
   updateMember(null);
 }
 
