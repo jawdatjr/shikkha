@@ -109,7 +109,7 @@ async function appendEvent(e) {
       return { applied: false, conflict: { id: e.id, entity: e.entity, entityId: e.entityId, expected } };
     }
     const stampedEvent = {
-      entity: e.entity, entityId: e.entityId, action: e.action, payload: e.payload,
+      entity: e.entity, entityId: e.entityId, headKey: e.entity + ':' + e.entityId, action: e.action, payload: e.payload,
       base: e.base, clientAt: String(e.clientAt || ''), actorUid: member.uid,
       actor: member.displayName, serverAt: serverTimestamp()
     };
