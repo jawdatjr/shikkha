@@ -8,6 +8,7 @@
   const email = document.getElementById('firebaseGateEmail');
   const password = document.getElementById('firebaseGatePassword');
   const message = document.getElementById('firebaseGateMessage');
+  const localCount = document.getElementById('firebaseGateLocalCount');
   const submit = document.getElementById('firebaseGateSubmit');
   const toggle = document.getElementById('firebaseGateTogglePassword');
   const memberBadge = document.getElementById('firebaseActiveMember');
@@ -17,6 +18,16 @@
   if (!gate || !appRoot || !form || !email || !password || !message || !submit) return;
 
   function lock() {
+    if (localCount) {
+      try {
+        const receipts = JSON.parse(localStorage.getItem('mrs_receipt_history_v1') || '[]');
+        const expenses = JSON.parse(localStorage.getItem('mrs_expenses_history_v1') || '[]');
+        localCount.textContent = 'এই ডিভাইসে সেভ আছে: ' + (Array.isArray(receipts) ? receipts.length : 0) +
+          'টি রিসিপ্ট • ' + (Array.isArray(expenses) ? expenses.length : 0) + 'টি খরচ';
+      } catch (_) {
+        localCount.textContent = 'আপনার পুরোনো ফোনের হিসাব মুছবেন না।';
+      }
+    }
     document.body.classList.remove('firebase-unlocked');
     document.body.classList.add('firebase-locked');
     appRoot.inert = true;
