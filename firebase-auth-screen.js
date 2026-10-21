@@ -13,6 +13,24 @@
   const toggle = document.getElementById('firebaseGateTogglePassword');
   const memberBadge = document.getElementById('firebaseActiveMember');
   const gateSpinner = document.getElementById('firebaseGateWait');
+  const brandTitle = document.getElementById('firebaseGateHeading');
+  const tourTitle = document.getElementById('firebaseGateTourTitle');
+  const tourPrice = document.getElementById('firebaseGateTourPrice');
+  const brandSettingsKey = 'mrs_company_settings_v2';
+  const defaultBrand = 'ব্রাহ্মণবাড়িয়া ট্যুর লাভার্স';
+  const defaultTour = 'সিলেট - সাদাপাথর ডে ট্যুর (৫–৬ নভেম্বর ২০২৬)';
+  function refreshBrand() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(brandSettingsKey) || '{}') || {}; } catch (_) {}
+    if (brandTitle) brandTitle.textContent = String(saved.companyBn || defaultBrand);
+    if (tourTitle) tourTitle.textContent = String(saved.tourTitle || defaultTour);
+    if (tourPrice) {
+      const value = Number(saved.tourRate);
+      const price = Number.isFinite(value) && value >= 0 ? value : 1499;
+      tourPrice.textContent = '৳' + price.toLocaleString('bn-BD');
+    }
+  }
+
   let busy = false;
   let subscribed = false;
   if (!gate || !appRoot || !form || !email || !password || !message || !submit) return;
@@ -99,6 +117,9 @@
     toggle.textContent = show ? 'Hide' : 'Show';
     toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
   });
+  window.addEventListener('shikkha-brand-updated', refreshBrand);
+  window.addEventListener('storage', function(e){ if(e.key === brandSettingsKey)refreshBrand(); });
+  refreshBrand();
   window.addEventListener('shikkha-firebase-ready', connect, { once: true });
   connect();
   lock();
