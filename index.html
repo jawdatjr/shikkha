@@ -2342,26 +2342,26 @@ Nearby Sadar Hospital Road.</textarea>
           </div>
 
           <section class="panel-card" aria-labelledby="cloudSyncTitle">
-            <h3 id="cloudSyncTitle" class="font-extrabold text-base mb-1">☁️ একাধিক মোবাইল • Auto GitHub Backup</h3>
-            <p class="text-xs text-slate-600 mb-3">এন্ট্রি আগে ফোনে সেভ হয়। নেট থাকলে Cloudflare Worker-এর মাধ্যমে private GitHub রিপোজিটরিতে ব্যাকআপ হয়; অন্য ফোনে একই কোম্পানির তথ্য আসে। প্রতিটি সেলসম্যানের আলাদা Sync Key দিন।</p>
-            <label class="form-label" for="inpWorkerUrl">Worker URL (HTTPS)</label>
-            <input id="inpWorkerUrl" class="form-input mb-2" placeholder="https://your-worker.workers.dev" autocomplete="off" />
-            <label class="form-label" for="inpWorkerActor">এই সেলসম্যানের নাম</label>
-            <input id="inpWorkerActor" class="form-input mb-2" placeholder="Salesman 01" autocomplete="off" />
-            <label class="form-label" for="inpWorkerToken">এই সেলসম্যানের Private Sync Key</label>
-            <input id="inpWorkerToken" type="password" class="form-input mb-2" placeholder="Worker-এ দেওয়া লম্বা গোপন Key" autocomplete="off" />
+            <h3 id="cloudSyncTitle" class="font-extrabold text-base mb-1">☁️ Firebase • নিরাপদ Multi-Mobile Sync</h3>
+            <p class="text-xs text-slate-600 mb-3">আগে ফোনে অফলাইনে সেভ হবে। অনুমোদিত সেলসম্যান Firebase Email/Password দিয়ে লগইন করলে নেট ফিরলে রিসিপ্ট ও খরচ সব ফোনে Sync হবে। Owner Firebase Console থেকে কর্মীদের অ্যাকাউন্ট ও অনুমতি দেন।</p>
+            <label class="form-label" for="inpFirebaseEmail">সেলসম্যানের Firebase Email</label>
+            <input id="inpFirebaseEmail" type="email" class="form-input mb-2" placeholder="salesman@example.com" autocomplete="username" />
+            <label class="form-label" for="inpFirebasePassword">Password (শুধু লগইনের জন্য)</label>
+            <input id="inpFirebasePassword" type="password" class="form-input mb-2" placeholder="Firebase Authentication password" autocomplete="current-password" />
             <div class="flex flex-wrap gap-2 my-3">
-              <button id="btnSaveCloudConfig" type="button" class="btn btn-primary">🔒 সংযোগ সেভ</button>
+              <button id="btnFirebaseLogin" type="button" class="btn btn-primary">🔒 Firebase Login</button>
+              <button id="btnFirebaseLogout" type="button" class="btn btn-outline">Logout</button>
               <button id="btnSyncNow" type="button" class="btn btn-emerald">🔄 এখনই Sync</button>
               <button id="btnResolveCloudConflicts" type="button" class="hidden btn btn-danger">⚠️ আমার পরিবর্তন রাখুন</button>
               <button id="btnKeepCloudVersion" type="button" class="hidden btn btn-outline">☁️ ক্লাউডের পরিবর্তন রাখুন</button>
             </div>
-            <div class="text-xs font-bold text-slate-700" role="status" id="cloudStatusText">Cloud Sync সেটআপ করা হয়নি</div>
+            <p id="firebaseUserLabel" class="text-xs font-bold text-slate-700 mb-2">Firebase-এ লগইন করা হয়নি</p>
+            <div class="text-xs font-bold text-slate-700" role="status" id="cloudStatusText">Firebase Sync প্রস্তুত • Owner-এর Security Rules ও Login সেটআপ প্রয়োজন</div>
             <div class="text-xs text-slate-600 mt-2">অপেক্ষায়: <strong id="cloudPendingCount">0</strong> • শেষ Sync: <strong id="cloudLastSync">এখনও হয়নি</strong></div>
-            <p class="text-[11px] text-amber-800 mt-2">⚠️ কর্মীর ফোনে রাখা Sync Key হারিয়ে গেলে সেটি বাতিল করুন। Worker/GitHub Token কখনো অ্যাপে দেবেন না। ফোন অনলাইনে এলে অ্যাপ খোলা অবস্থায় Auto Sync হয়।</p>
+            <p class="text-[11px] text-amber-800 mt-2">⚠️ Firebase Console-এ firestore.rules deploy না করে customer data Sync করবেন না। লগআউট করলেও ফোনে অফলাইন ডেটা থাকে। প্রথম migration একটি প্রধান ফোন থেকে করুন ও আগে JSON backup নিন।</p>
           </section>
 
-          <!-- Salesman Tour Package Presets Manager -->
+                    <!-- Salesman Tour Package Presets Manager -->
           <div class="panel-card">
             <div class="border-b border-slate-200 pb-3 mb-3">
               <h3 class="text-base font-extrabold text-slate-800">⚡ সেলসম্যান ট্যুর প্যাকেজ প্রিসেট (Quick Tour Packages)</h3>
@@ -5610,15 +5610,36 @@ Nearby Sadar Hospital Road.</textarea>
         var d=document.getElementById('btnKeepCloudVersion');if(d)d.classList.toggle('hidden',!cloud.conflicts.length);
       }
       function syncRenderSettings() {
-        var ep=document.getElementById('inpWorkerUrl'),tk=document.getElementById('inpWorkerToken'),nm=document.getElementById('inpWorkerActor');
-        if(ep) ep.value=cloud.config.endpoint||'';
-        if(tk) tk.value=cloud.config.token||'';
-        if(nm) nm.value=cloud.config.label||'';
+        var current=window.shikkhaFirebase && window.shikkhaFirebase.member;
+        var status=document.getElementById('firebaseUserLabel');
+        if(status) status.textContent=current
+          ? ('✅ '+current.displayName+' • '+current.role+' • Firebase UID: '+current.uid)
+          : 'Firebase-এ অনুমোদিত সেলসম্যান হিসেবে লগইন করা হয়নি';
         var badge=document.getElementById('cloudPendingCount');if(badge) badge.textContent=String(cloud.queue.length);
         var last=document.getElementById('cloudLastSync');if(last)last.textContent=cloud.lastSync||'এখনও হয়নি';
         syncShowConflicts();
       }
-      function syncInitialize() {
+      function syncPrepareFirebaseMigration() {
+        var key='ashik_firebase_migrated_v1';
+        if(safeGetStorage(key)==='yes')return true;
+        // Move the current phone's ACTUAL receipt/expense state, not old GitHub Worker events.
+        // First migration should be from one chosen primary phone only.
+        var pending=[];
+        appState.history.forEach(function(item){pending.push(syncQueueEvent('receipt','upsert',item));});
+        appState.expenses.forEach(function(item){pending.push(syncQueueEvent('expense','upsert',item));});
+        pending.forEach(function(e){e.base=null;});
+        if(!safeSetStorage(SYNC_KEYS.queue,JSON.stringify(pending))) {
+          syncStatus('Firebase migration queue সেভ হয়নি; আগে JSON Backup নিন');return false;
+        }
+        cloud.queue=pending;
+        cloud.heads={};cloud.known=[];cloud.conflicts=[];
+        safeSetStorage(SYNC_KEYS.heads,'{}');safeSetStorage(SYNC_KEYS.known,'[]');
+        if(window.shikkhaFirebase)window.shikkhaFirebase.resetCursor();
+        safeSetStorage(key,'yes');
+        syncRenderSettings();
+        return true;
+      }
+            function syncInitialize() {
         cloud.config=syncRead(SYNC_KEYS.config,cloud.config);
         cloud.queue=syncRead(SYNC_KEYS.queue,[]);
         cloud.audit=syncRead(SYNC_KEYS.audit,[]);
@@ -5649,22 +5670,30 @@ Nearby Sadar Hospital Road.</textarea>
           } else {showToast('পুরনো হিসাব ক্লাউড কিউতে রাখা যায়নি; JSON ব্যাকআপ নিন','⚠️');}
         }
         syncRenderAudit();syncRenderSettings();
-        document.getElementById('btnSaveCloudConfig').addEventListener('click',function(){
-          var endpoint=document.getElementById('inpWorkerUrl').value.trim().replace(/\/+$/,'');
-          var token=document.getElementById('inpWorkerToken').value.trim();
-          var label=document.getElementById('inpWorkerActor').value.trim();
-          if(!/^https:\/\/[a-z0-9.-]+(?:\:[0-9]+)?$/i.test(endpoint) && !/^http:\/\/localhost(?::\d+)?$/i.test(endpoint)){
-            showToast('সঠিক HTTPS Worker URL লিখুন','⚠️');return;
-          }
-          if(token.length<24||!label){showToast('সেলসম্যানের নাম ও ২৪+ অক্ষরের Sync Key দিন','⚠️');return;}
-          cloud.config={endpoint:endpoint,token:token,label:label};
-          if(!safeSetStorage(SYNC_KEYS.config,JSON.stringify(cloud.config))){showToast('কনফিগারেশন সেভ হয়নি','⚠️');return;}
-          syncStatus('সংযোগ সেভ হয়েছে; সিঙ্ক চালু হচ্ছে');syncLater(100);showToast('সেলসম্যানের Cloud Sync সেটিংস সেভ হয়েছে','🔒');
+        document.getElementById('btnFirebaseLogin').addEventListener('click',async function(){
+          if(!window.shikkhaFirebase){syncStatus('Firebase SDK লোড হয়নি; অনলাইনে পেজ Reload করুন');return;}
+          var email=document.getElementById('inpFirebaseEmail').value.trim();
+          var pass=document.getElementById('inpFirebasePassword').value;
+          if(!email||!pass){syncStatus('Firebase Email ও Password দিন');return;}
+          try{
+            syncStatus('Firebase Login চলছে...');
+            var user=await window.shikkhaFirebase.signIn(email,pass);
+            document.getElementById('inpFirebasePassword').value='';
+            cloud.config.label=user.displayName;
+            syncRenderSettings();
+            if(syncPrepareFirebaseMigration())syncLater(150);
+          }catch(err){syncStatus('⚠️ Firebase Login হয়নি: '+(err.message||String(err)));}
         });
-        document.getElementById('btnSyncNow').addEventListener('click',function(){syncNow();});
+        document.getElementById('btnFirebaseLogout').addEventListener('click',async function(){
+          if(!window.shikkhaFirebase)return;
+          if(cloud.queue.length && !confirm('এই ফোনে '+cloud.queue.length+'টি পরিবর্তন Sync হয়নি। Logout করলে এগুলো ফোনে থাকবে, কিন্তু নতুন লগইন ছাড়া পাঠানো যাবে না। Logout করবেন?'))return;
+          try {await window.shikkhaFirebase.logOut();syncRenderSettings();syncStatus('Firebase Logout হয়েছে; Offline data এই ফোনেই আছে');}
+          catch(err){syncStatus('Logout ব্যর্থ: '+(err.message||String(err)));}
+        });
+                document.getElementById('btnSyncNow').addEventListener('click',function(){syncNow();});
         document.getElementById('btnKeepCloudVersion').addEventListener('click',function(){
           if(!cloud.conflicts.length)return;
-          if(!confirm('এই ফোনের সংঘর্ষযুক্ত পরিবর্তন বাদ দিয়ে GitHub-এর সর্বশেষ হিসাব রাখবেন? ফোনের অসম্পন্ন পরিবর্তন ফিরে পাওয়া যাবে না। আগে JSON ব্যাকআপ নেওয়া ভালো।'))return;
+          if(!confirm('এই ফোনের সংঘর্ষযুক্ত পরিবর্তন বাদ দিয়ে Firebase-এর সর্বশেষ হিসাব রাখবেন? ফোনের অসম্পন্ন পরিবর্তন ফিরে পাওয়া যাবে না। আগে JSON ব্যাকআপ নেওয়া ভালো।'))return;
           var keys=new Set(cloud.conflicts.map(function(c){return syncKey(c.entity,c.entityId);}));
           cloud.queue=cloud.queue.filter(function(e){return !keys.has(syncKey(e.entity,e.entityId));});
           if(!safeSetStorage(SYNC_KEYS.queue,JSON.stringify(cloud.queue))){showToast('Local Queue সেভ হয়নি','⚠️');return;}
@@ -5681,7 +5710,7 @@ Nearby Sadar Hospital Road.</textarea>
           cloud.snapshots.expense=syncMap(appState.expenses);
           cloud.conflicts=[];syncShowConflicts();
           renderHistoryList();renderExpenseList();renderDashboardAnalytics();
-          showToast('GitHub-এর সর্বশেষ সংস্করণ রাখা হয়েছে','☁️');syncLater(100);
+          showToast('Firebase-এর সর্বশেষ সংস্করণ রাখা হয়েছে','☁️');syncLater(100);
         });
         document.getElementById('btnResolveCloudConflicts').addEventListener('click',function(){
           if(!cloud.conflicts.length)return;
@@ -5694,44 +5723,53 @@ Nearby Sadar Hospital Road.</textarea>
         window.addEventListener('online',function(){syncLater(250);});
         document.addEventListener('visibilitychange',function(){if(!document.hidden)syncLater(250);});
         window.setInterval(function(){if(navigator.onLine)syncNow();},60000);
-        if(cloud.config.endpoint&&cloud.config.token)syncLater(500);
-        else syncStatus('ফোনে অফলাইন সেভ চলছে; Cloud Sync সেটআপ করা হয়নি');
+        function connectFirebaseSession(){
+          if(!window.shikkhaFirebase){syncStatus('Firebase SDK Load হয়নি; ইন্টারনেট থাকলে Reload করুন');return;}
+          window.shikkhaFirebase.subscribe(function(member,error){
+            if(member){
+              cloud.config.label=member.displayName;
+              syncRenderSettings();
+              if(syncPrepareFirebaseMigration())syncLater(350);
+            }else{
+              syncRenderSettings();
+              syncStatus(error ? ('⚠️ '+error) : 'Firebase Login প্রয়োজন • ফোনে Offline Save চালু আছে');
+            }
+          });
+        }
+        if(window.shikkhaFirebase)connectFirebaseSession();
+        else window.addEventListener('shikkha-firebase-ready',connectFirebaseSession,{once:true});
       }
-      function syncLater(delay) {
+            function syncLater(delay) {
         if(cloud.timer)clearTimeout(cloud.timer);
         cloud.timer=setTimeout(syncNow,delay);
       }
       async function syncNow() {
         if(!cloud.ready||cloud.busy)return;
-        if(!cloud.config.endpoint||!cloud.config.token){syncStatus('Cloud Sync চালু করতে Settings-এ Worker URL ও Salesman Key দিন');return;}
+        var fb=window.shikkhaFirebase;
+        if(!fb){syncStatus('Firebase SDK Load হয়নি; Online Reload করুন');return;}
+        if(!fb.member){syncStatus(fb.error||'Firebase Login প্রয়োজন • Offline Save চালু আছে');return;}
         if(navigator.onLine===false){syncStatus('অফলাইন: '+cloud.queue.length+'টি পরিবর্তন ফোনে সেভ আছে');return;}
-        cloud.busy=true;syncStatus('Cloud Sync চলছে...');
+        cloud.busy=true;syncStatus('Firebase Sync চলছে...');
         try {
-          var batch=cloud.queue.slice(0,80);
-          var controller=new AbortController();var timeout=setTimeout(function(){controller.abort();},25000);
-          var response;
-          try {response=await fetch(cloud.config.endpoint+'/sync',{
-            method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+cloud.config.token},
-            body:JSON.stringify({events:batch}),signal:controller.signal,cache:'no-store'
-          });}finally{clearTimeout(timeout);}
-          var data=await response.json();
-          if(!response.ok)throw new Error(data.error||('HTTP '+response.status));
-          if(!Array.isArray(data.events)||!Array.isArray(data.applied))throw new Error('Sync response invalid');
+          var batch=cloud.queue.slice(0,40);
+          var data=await fb.sync(batch);
+          if(!Array.isArray(data.events)||!Array.isArray(data.applied))throw new Error('Firebase Sync response invalid');
           var accepted=new Set(data.applied);
           cloud.queue=cloud.queue.filter(function(e){return !accepted.has(e.id);});
           if(!safeSetStorage(SYNC_KEYS.queue,JSON.stringify(cloud.queue)))throw new Error('ফোনে Sync Queue আপডেট হয়নি');
           cloud.conflicts=Array.isArray(data.conflicts)?data.conflicts:[];
           cloud.lastRemoteEvents=data.events;
           syncAcceptCloudEvents(data.events);
+          fb.ackCursor(data.cursor);
           cloud.lastSync=new Date().toLocaleString('bn-BD');safeSetStorage(SYNC_KEYS.last,cloud.lastSync);
           syncRenderSettings();
           if(cloud.conflicts.length)syncStatus('⚠️ '+cloud.conflicts.length+'টি Conflict; Settings থেকে সমাধান করুন');
-          else syncStatus('✅ GitHub ব্যাকআপ আপডেট • '+data.events.length+'টি Event • Pending '+cloud.queue.length);
-          if(cloud.queue.length&&!cloud.conflicts.length)syncLater(700);
-        } catch(err){syncStatus('⚠️ Sync হয়নি: '+String(err.message||err)+' • ফোনে এন্ট্রি আছে');}
+          else syncStatus('✅ Firebase Sync সম্পন্ন • '+data.events.length+'টি Event • Pending '+cloud.queue.length);
+          if((cloud.queue.length&&!cloud.conflicts.length)||data.hasMore)syncLater(900);
+        } catch(err){syncStatus('⚠️ Firebase Sync হয়নি: '+String(err.message||err)+' • ফোনে এন্ট্রি আছে');}
         finally{cloud.busy=false;}
       }
-      function syncAcceptCloudEvents(events){
+            function syncAcceptCloudEvents(events){
         var already=new Set(cloud.known),dirtyReceipt=false,dirtyExpense=false;
         for(var i=0;i<events.length;i++){
           var e=events[i];
@@ -5937,6 +5975,7 @@ Nearby Sadar Hospital Road.</textarea>
       });
     })();
   </script>
+  <script type="module" src="./firebase-sync.js"></script>
   <!-- Original HTML-inspired full-screen tour: no place names, no click interception. -->
   <canvas id="groupTravelStoryCanvas" class="no-print" aria-hidden="true"></canvas>
   <script src="./travel-animation-pwa-v17.js" defer></script>
