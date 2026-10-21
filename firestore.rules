@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Create members/{firebaseAuthUid} documents manually in Firebase Console.
+    // Membership is NEVER self-service (prevents a visitor becoming an owner).
+    function memberPath() {
+      return /databases/$(database)/documents/members/$(request.auth.uid);
+    }
+    function isMember() {
+      return request.auth != null &&
+        exists(memberPath()) &&
+        get(memberPath()).data.active == true &&
+        get(memberPath()).data.role in ['owner', 'salesman'];
+    }
+    function isOwner() {
+      return isMember() && get(memberPath()).data.role == 'owner';
+    }
+    function validEntity(entity) { return entity in ['receipt', 'expense']; }
+    function eventPath(eventId) {
+      return /databases/$(database)/documents/events/$(eventId);
+    }
+    function headPath(headKey) {
+      return /databases/$(database)/documents/heads/$(headKey);
+    }
+    function validHeadRequest() {
+      let d = request.resource.data;
+      return isMember() &&
+        d.keys().hasAll(['entity','entityId','headId','base','actorUid','updatedAt']) &&
+        d.keys().hasOnly(['entity','entityId','headId','base','actorUid','updatedAt']) &&
+        validEntity(d.entity) &&
+        d.entityId is string && d.entityId.size() > 0 &&
+        d.headId is string && d.headId.size() > 0 &&
+        d.actorUid == request.auth.uid &&
+        d.updatedAt == request.time &&
+        // The newly referenced event MUST be created in the same transaction.
+        !exists(eventPath(d.headId)) &&
+        getAfter(eventPath(d.headId)).data.actorUid == request.auth.uid &&
+        getAfter(eventPath(d.headId)).data.entity == d.entity &&
+        getAfter(eventPath(d.headId)).data.entityId == d.entityId &&
+        getAfter(eventPath(d.headId)).data.base == d.base;
+    }
+    match /members/{uid} {
+      allow get: if request.auth != null && (uid == request.auth.uid || isOwner());
+      allow list: if isOwner();
+      allow create, update, delete: if false; // Owner manages users in Console.
+    }
+    match /events/{eventId} {
+      allow get, list: if isMember();
+      allow create: if isMember() &&
+        request.resource.data.keys().hasAll([
+          'entity','entityId','headKey','action','payload','base','clientAt',
+          'actorUid','actor','serverAt'
+        ]) &&
+        request.resource.data.keys().hasOnly([
+          'entity','entityId','headKey','action','payload','base','clientAt',
+          'actorUid','actor','serverAt'
+        ]) &&
+        validEntity(request.resource.data.entity) &&
+        request.resource.data.entityId is string &&
+        request.resource.data.entityId.size() > 0 &&
+        request.resource.data.headKey ==
+          request.resource.data.entity + ':' + request.resource.data.entityId &&
+        request.resource.data.action in ['upsert', 'delete'] &&
+        request.resource.data.payload is map &&
+        request.resource.data.payload._syncId == request.resource.data.entityId &&
+        request.resource.data.clientAt is string &&
+        (request.resource.data.base == null || request.resource.data.base is string) &&
+        request.resource.data.actorUid == request.auth.uid &&
+        request.resource.data.actor == get(memberPath()).data.displayName &&
+        request.resource.data.serverAt == request.time &&
+        // Require the corresponding head to point at this event atomically.
+        getAfter(headPath(request.resource.data.headKey)).data.headId == eventId;
+      allow update, delete: if false; // Immutable audit log.
+    }
+    match /heads/{headKey} {
+      allow get, list: if isMember();
+      allow create: if validHeadRequest() &&
+        headKey == request.resource.data.entity + ':' + request.resource.data.entityId &&
+        request.resource.data.base == null;
+      allow update: if validHeadRequest() &&
+        headKey == request.resource.data.entity + ':' + request.resource.data.entityId &&
+        request.resource.data.base == resource.data.headId;
+      allow delete: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
