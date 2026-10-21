@@ -5718,10 +5718,20 @@ Nearby Sadar Hospital Road.</textarea>
         appState.history.forEach(function(item){pending.push(syncQueueEvent('receipt','upsert',item));});
         appState.expenses.forEach(function(item){pending.push(syncQueueEvent('expense','upsert',item));});
         pending.forEach(function(e){e.base=null;});
+        if(pending.length && !confirm(
+          'এই ফোনে '+appState.history.length+'টি রিসিপ্ট এবং '+appState.expenses.length+'টি খরচ আছে।\\n\\n'+
+          'এই ফোনটিকে প্রথম Firebase Backup-এর মূল উৎস হিসেবে Sync করবেন?\\n'+
+          'আগে History → Backup (JSON) ফাইলটি নিরাপদ স্থানে সংরক্ষণ করুন।\\n'+
+          'অন্য ফোনে একই পুরোনো হিসাব থাকলে আলাদা Upload করলে Duplicate হতে পারে।'
+        )) {
+          syncStatus('Firebase Migration অপেক্ষায় • আগে এই ফোনে JSON Backup নিয়ে আবার Sync করুন');
+          return false;
+        }
         if(!safeSetStorage(SYNC_KEYS.queue,JSON.stringify(pending))) {
           syncStatus('Firebase migration queue সেভ হয়নি; আগে JSON Backup নিন');return false;
         }
         cloud.queue=pending;
+        cloud.lastSync='';safeSetStorage(SYNC_KEYS.last,'');
         cloud.heads={};cloud.known=[];cloud.conflicts=[];
         safeSetStorage(SYNC_KEYS.heads,'{}');safeSetStorage(SYNC_KEYS.known,'[]');
         if(window.shikkhaFirebase)window.shikkhaFirebase.resetCursor();
@@ -5838,6 +5848,7 @@ Nearby Sadar Hospital Road.</textarea>
         var fb=window.shikkhaFirebase;
         if(!fb){syncStatus('Firebase SDK Load হয়নি; Online Reload করুন');return;}
         if(!fb.member){syncStatus(fb.error||'Firebase Login প্রয়োজন • Offline Save চালু আছে');return;}
+        if(!syncPrepareFirebaseMigration())return;
         if(navigator.onLine===false){syncStatus('অফলাইন: '+cloud.queue.length+'টি পরিবর্তন ফোনে সেভ আছে');return;}
         cloud.busy=true;syncStatus('Firebase Sync চলছে...');
         try {
